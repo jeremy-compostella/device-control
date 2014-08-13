@@ -140,7 +140,7 @@ its functions available to device control."
 
 (defmacro dctrl-buf-list (var-name var-value &optional bufs)
   (declare (indent 1))
-  `(let ((my-bufs (or bufs (dctrl-buffers))))
+  `(let ((my-bufs (or ,bufs (dctrl-buffers))))
      (delete-if-not (curry 'eq ,var-value) my-bufs
 		    :key (curry 'buffer-local-value ,var-name))))
 
@@ -310,21 +310,21 @@ functions should use this."
   (with-current-buffer (process-buffer p)
     (insert (replace-regexp-in-string "\r" "\n" str))))
 
-(defmacro dctrl-internal-run-process (start-process-fun)
+(defmacro dctrl-internal-run-process (args start-process-fun)
   `(lexical-let ((args args))
      (list (lambda ()
-	     (dctrl-msg (mapconcat 'identity args " "))
-	     (set-process-sentinel (apply ,start-process-fun "ctrl" (current-buffer) args)
+	     (dctrl-msg (mapconcat 'identity ,args " "))
+	     (set-process-sentinel (apply ,start-process-fun "ctrl" (current-buffer) ,args)
 				   'dctrl-process-sentinel)
 	     (set-process-filter (get-buffer-process (current-buffer))
 				 'dctrl-process-filter)
 	     'sleep))))
 
 (defun dctrl-run-process (args)
-  (dctrl-internal-run-process 'start-file-process))
+  (dctrl-internal-run-process args 'start-file-process))
 
 (defun dctrl-run-local-process (args)
-  (dctrl-internal-run-process 'start-process))
+  (dctrl-internal-run-process args 'start-process))
 
 (defun dctrl-action-wait (&optional seconds)
   (let ((seconds (or seconds (read-number "Seconds: "))))
