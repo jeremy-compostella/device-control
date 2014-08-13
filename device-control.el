@@ -299,6 +299,23 @@ functions should use this."
 							 (length prefix)) x))))))
     (sort (cdr fun-list) (lambda (x y) (string< (car x) (car y))))))
 
+(defun dctrl-get-backend-from-fun-name (fun)
+  (let ((name (symbol-name fun)))
+    (string-match "dctrl-\\\(.*\\\)-action" name)
+    (match-string 1 name)))
+
+(defmacro dctrl-agregate-fun-list (&rest lists)
+  `(let ((all (make-symbol "all")))
+     (setq all (sort (append ,@lists) (lambda (x y) (string< (car x) (car y)))))
+     (let ((cur all))
+     (while (cdr cur)
+       (when (string= (caar cur) (caadr cur))
+	 (let ((action (caar cur)))
+	   (setcar (car cur) (concat (dctrl-get-backend-from-fun-name (cdar cur)) "-" action))
+	   (setcar (cadr cur) (concat (dctrl-get-backend-from-fun-name (cdadr cur)) "-" action))))
+       (setq cur (cdr cur))))
+     all))
+
 (defun dctrl-process-sentinel (p e)
   (with-current-buffer (process-buffer p)
     (if (string= e "finished\n")
