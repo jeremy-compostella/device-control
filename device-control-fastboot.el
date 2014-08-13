@@ -43,6 +43,17 @@
 (defun dctrl-fastboot-action-dnx ()
   (dctrl-fastboot-run "oem" "reboot" "dnx"))
 
+(defconst dctrl-fastboot-erase-flash-list '("system" "cache" "factory" "logs"
+					    "data" "misc" "config" "recovery" "boot"))
+
+(defun dctrl-fastboot-action-erase (&optional partition)
+  (let ((partition (or partition (ido-completing-read "Partition name: " dctrl-fastboot-erase-flash-list nil t))))
+    (dctrl-run-process (dctrl-fastboot-run "erase" partition))))
+
+(defun dctrl-fastboot-action-format (&optional partition)
+  (let ((partition (or partition (ido-completing-read "Partition name: " dctrl-fastboot-erase-flash-list nil t))))
+    (dctrl-run-process (dctrl-fastboot-run "format" partition))))
+
 (defun dctrl-fastboot-get-actions ()
   (dctrl-build-fun-list "dctrl-fastboot-action-"))
 
