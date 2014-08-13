@@ -48,11 +48,11 @@
 
 (defun dctrl-fastboot-action-erase (&optional partition)
   (let ((partition (or partition (ido-completing-read "Partition name: " dctrl-fastboot-erase-flash-list nil t))))
-    (dctrl-run-process (dctrl-fastboot-run "erase" partition))))
+    (dctrl-fastboot-run "erase" partition)))
 
 (defun dctrl-fastboot-action-format (&optional partition)
   (let ((partition (or partition (ido-completing-read "Partition name: " dctrl-fastboot-erase-flash-list nil t))))
-    (dctrl-run-process (dctrl-fastboot-run "format" partition))))
+    (dctrl-fastboot-run "format" partition)))
 
 (defun dctrl-fastboot-get-actions ()
   (dctrl-build-fun-list "dctrl-fastboot-action-"))
