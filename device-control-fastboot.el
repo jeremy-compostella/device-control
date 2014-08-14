@@ -17,12 +17,22 @@
 	 tramp-cmd ctrlhost-filename)
     (unless (and file (file-exists-p file))
       (setq file (ido-read-file-name "Fastboot file: " nil
-				     (assoc-default type ctrl-fastboot-flash-alist))))
-  
+				     (assoc-default type dctrl-fastboot-flash-alist) t)))
     (multiple-value-setq (tramp-cmd ctrlhost-filename)
       (dctrl-untramp-file file))
     (append tramp-cmd
 	    (dctrl-fastboot-run "flash" type (expand-file-name ctrlhost-filename)))))
+
+(defvar dctrl-fastboot-partition-list '("system" "cache" "data" "misc" "recovery" "boot"))
+
+(defun dctrl-fastboot-action-erase (&optional partition)
+  (let ((partition (or partition (ido-completing-read "Partition name: " dctrl-fastboot-partition-list nil t))))
+    (dctrl-fastboot-run "erase" partition)))
+
+(defun dctrl-fastboot-action-format (&optional partition)
+  (let ((partition (or partition (ido-completing-read "Partition name: " dctrl-fastboot-partition-list nil t))))
+    (dctrl-fastboot-run "format" partition)))
+
 
 (defun dctrl-fastboot-action-boot (&optional file)
   (let* ((file file)
@@ -37,22 +47,14 @@
 (defun dctrl-fastboot-action-dnx ()
   (dctrl-fastboot-run "oem" "reboot" "dnx"))
 
-(defun dctrl-fastboot-action-fastboot-continue ()
+(defun dctrl-fastboot-action-continue ()
   (dctrl-fastboot-run "continue"))
 
-(defun dctrl-fastboot-action-dnx ()
-  (dctrl-fastboot-run "oem" "reboot" "dnx"))
+(defun dctrl-fastboot-action-reboot ()
+  (dctrl-fastboot-run "reboot"))
 
-(defconst dctrl-fastboot-erase-flash-list '("system" "cache" "factory" "logs"
-					    "data" "misc" "config" "recovery" "boot"))
-
-(defun dctrl-fastboot-action-erase (&optional partition)
-  (let ((partition (or partition (ido-completing-read "Partition name: " dctrl-fastboot-erase-flash-list nil t))))
-    (dctrl-fastboot-run "erase" partition)))
-
-(defun dctrl-fastboot-action-format (&optional partition)
-  (let ((partition (or partition (ido-completing-read "Partition name: " dctrl-fastboot-erase-flash-list nil t))))
-    (dctrl-fastboot-run "format" partition)))
+(defun dctrl-fastboot-action-reboot-bootloader ()
+  (dctrl-fastboot-run "reboot-bootloader"))
 
 (defun dctrl-fastboot-get-actions ()
   (dctrl-build-fun-list "dctrl-fastboot-action-"))
