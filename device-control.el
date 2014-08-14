@@ -34,8 +34,8 @@
 
 (require 'ido)
 
-(defconst dctrl-buf-prefix "*ctrl-")
-(defconst dctrl-buf-fmt (concat dctrl-buf-prefix "%s*"))
+(defconst dctrl-buf-prefix "*rl-")
+(defconst dctrl-buf-fmt "*dctrl:%s-%s*")
 
 (defvar dctrl-backends '()
   "List of regitered backends through `dctrl-register-backend'.")
@@ -144,17 +144,6 @@ its functions available to device control."
      (delete-if-not (curry 'eq ,var-value) my-bufs
 		    :key (curry 'buffer-local-value ,var-name))))
 
-(defun dctrl-buffer-lookup (state)
-  (let ((bufs (dctrl-buf-list 'dctrl-state state)))
-    (cond ((= (length bufs) 0) (error "No buffer found"))
-	  ((= (length bufs) 1) (car bufs))
-	  (get-buffer (ido-completing-read "Buffer: " (mapcar 'buffer-name bufs))))))
-
-(defun dctrl-smart-buf-selection (device state)
-  (or (and device (get-buffer (format dctrl-buf-fmt device)))
-      (and (eq major-mode 'device-control-mode) (current-buffer))
-      (dctrl-buffer-lookup state)))
-
 (defun dctrl-kill-current (&optional device-name)
   "Kill the current action."
   (interactive)
@@ -163,7 +152,7 @@ its functions available to device control."
     (kill-process)))
 
 (defun dctrl-create-buffer(device-name backend-name)
-  (let ((buf (get-buffer-create (format dctrl-buf-fmt device-name)))
+  (let ((buf (get-buffer-create (format dctrl-buf-fmt backend-name device-name)))
 	(backend (dctrl-get-backend-by-name backend-name)))
     (with-current-buffer buf
       (device-control-mode)
