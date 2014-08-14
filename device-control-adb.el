@@ -9,9 +9,6 @@
 (defun dctrl-adb-action-reboot ()
   (dctrl-adb-run "reboot"))
 
-(defun dctrl-adb-action-efi-shell ()
-  (dctrl-adb-run "shell" "uefivar" "-g" "8be4df61-93ca-11d2-aa0d-00e098032b8c" "-n" "BootNext" "-t" "int16" "-s" "1"))
-
 (defvar dctrl-adb-reboot-target '("bootloader" "recovery"))
 
 (defun dctrl-adb-action-reboot (&optional target)
