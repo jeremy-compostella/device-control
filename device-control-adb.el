@@ -12,14 +12,11 @@
 (defun dctrl-adb-action-efi-shell ()
   (dctrl-adb-run "shell" "uefivar" "-g" "8be4df61-93ca-11d2-aa0d-00e098032b8c" "-n" "BootNext" "-t" "int16" "-s" "1"))
 
-(defun dctrl-adb-action-dnx ()
-  (dctrl-adb-run "reboot" "dnx"))
+(defvar dctrl-adb-reboot-target '("bootloader" "recovery"))
 
-(defun dctrl-adb-action-recovery ()
-  (dctrl-adb-run "reboot" "recovery"))
-
-(defun dctrl-adb-action-bootloader ()
-  (dctrl-adb-run "reboot" "bootloader"))
+(defun dctrl-adb-action-reboot (&optional target)
+  (let ((target (or target (ido-completing-read "Target: " dctrl-adb-reboot-target nil t))))
+    (dctrl-adb-run "reboot" target)))
 
 (defun dctrl-adb-action-shutdown ()
   (dctrl-adb-run "shell" "am" "start" "-a"
