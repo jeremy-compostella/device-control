@@ -20,7 +20,7 @@
 			    (append (mapcar (curry 'concat "adb:") adb-devices)
 				    (mapcar (curry 'concat "fastboot:") fastboot-devices))
 			    ", "))
-      (message "No devices available"))))
+      (message "No device available"))))
 
 (dctrl-register-backend
  (make-dctrl-backend :name "android"
