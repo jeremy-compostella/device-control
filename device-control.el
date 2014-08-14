@@ -34,7 +34,6 @@
 
 (require 'ido)
 
-(defconst dctrl-buf-prefix "*rl-")
 (defconst dctrl-buf-fmt "*dctrl:%s-%s*")
 
 (defvar dctrl-backends '()
