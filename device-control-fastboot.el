@@ -6,10 +6,10 @@
   (dctrl-run-process
    (nconc (list fastboot-exec) (list "-p" dctrl-device-name) args)))
 
-(defconst dctrl-fastboot-flash-alist '(("boot"		.	"boot.img")
-				       ("fastboot"	.	"droidboot.img")
-				       ("recovery"	.	"recovery.img")
-				       ("system"	.	"system.img")))
+(defvar dctrl-fastboot-flash-alist '(("boot"		.	"boot.img")
+				     ("bootloader"	.	"bootloader.img")
+				     ("recovery"	.	"recovery.img")
+				     ("system"		.	"system.img")))
 
 (defun dctrl-fastboot-action-flash (&optional type file)
   (let* ((type (or type (ido-completing-read "Type of flash: " (mapcar 'car dctrl-fastboot-flash-alist) nil t)))
@@ -44,8 +44,7 @@
     (append tramp-cmd
 	    (dctrl-fastboot-run "boot" (expand-file-name ctrlhost-filename)))))
 
-(defun dctrl-fastboot-action-dnx ()
-  (dctrl-fastboot-run "oem" "reboot" "dnx"))
+(defun dctrl-fastboot-action-flash-raw (&optional kernel ramdisk)) ;TODO
 
 (defun dctrl-fastboot-action-continue ()
   (dctrl-fastboot-run "continue"))
