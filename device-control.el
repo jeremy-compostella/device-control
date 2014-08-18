@@ -180,13 +180,39 @@ its functions available to device control."
 		(dctrl-buf-list 'dctrl-backend backend-name state-bufs)
 	      state-bufs))))
 
+(defvar dctrl-last-used-device nil)	;TODO: make a list of used devices
+
+(defun dctrl-online-devices ()
+  (let ((backends (mapcar (curry 'buffer-local-value 'dctrl-backend) (dctrl-buffers))))
+    (let ((l '()))
+      (dolist (backend (delete-duplicates backends :key 'dctrl-backend-name :test 'string=))
+	(setq l (nconc l (funcall (dctrl-backend-guess-device-names backend)))))
+      l)))
+
+(defun dctrl-colorize-devices (devices)
+  (let ((onlines (dctrl-online-devices)))
+    (mapcar (lambda (x) (propertize x 'face
+				    (if (find x onlines :test 'string=)
+					'success
+				      'error)))
+	    devices)))
+
+(defun dctrl-device-score (device)
+  (+ (if (eq 'success (get-text-property 0 'face device)) 1 0)
+     (if (string= dctrl-last-used-device device) 2 0)))
+
+(defun dctrl-smart-order (devices)
+  (let ((devices (dctrl-colorize-devices devices)))
+    (sort devices (lambda (x y) (> (dctrl-device-score x)
+				   (dctrl-device-score y))))))
+
 (defun dctrl-complete-device (&optional state backend-name)
   (interactive)
   (let ((devices-list (dctrl-get-list-devices state backend-name)))
     (cond ((eq major-mode 'device-control-mode) dctrl-device-name)
 	  ((= 0 (length devices-list)) (device-control-start))
 	  ((= 1 (length devices-list)) (car devices-list))
-	  ((ido-completing-read "Device: " devices-list)))))
+	  ((ido-completing-read "Device: " (dctrl-smart-order devices-list))))))
 
 ;; Interactives
 (defun device-control-start (&optional backend-name device-name)
@@ -210,9 +236,11 @@ backend should have been registered with device-control-register-backend."
   "Enqueue a new action in the actions fifo for a device.
   Start the fifo execution if not running yet."
   (interactive (list (dctrl-complete-device)))
+  (setq dctrl-last-used-device device-name)
   (with-current-buffer (dctrl-get-buffer device-name)
     (let* ((actions dctrl-avail-actions)
-	   (action (ido-completing-read "Action: " (mapcar 'car actions) nil t)))
+	   (action (ido-completing-read (format "Action (on %s): " device-name)
+					(mapcar 'car actions) nil t)))
       (nconc dctrl-actions (funcall (assoc-default action actions)))
       (dctrl-start))))
 
