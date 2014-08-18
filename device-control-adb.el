@@ -9,7 +9,7 @@
 (defun dctrl-adb-action-reboot ()
   (dctrl-adb-run "reboot"))
 
-(defvar dctrl-adb-reboot-target '("bootloader" "recovery"))
+(defvar dctrl-adb-reboot-target '("" "bootloader" "recovery"))
 
 (defun dctrl-adb-action-reboot (&optional target)
   (let ((target (or target (ido-completing-read "Target: " dctrl-adb-reboot-target nil t))))
