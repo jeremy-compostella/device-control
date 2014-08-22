@@ -33,7 +33,6 @@
   (let ((partition (or partition (ido-completing-read "Partition name: " dctrl-fastboot-partition-list nil t))))
     (dctrl-fastboot-run "format" partition)))
 
-
 (defun dctrl-fastboot-action-boot (&optional file)
   (let* ((file file)
 	 tramp-cmd ctrlhost-filename)
@@ -55,8 +54,12 @@
 (defun dctrl-fastboot-action-reboot-bootloader ()
   (dctrl-fastboot-run "reboot-bootloader"))
 
+(defun dctrl-fastboot-connected-p ()
+  (find dctrl-device-name (dctrl-fastboot-guess-device-names) :key 'string=))
+
 (defun dctrl-fastboot-get-actions ()
-  (dctrl-build-fun-list "dctrl-fastboot-action-"))
+  (dctrl-build-fun-list "dctrl-fastboot-action-"
+			(if (dctrl-fastboot-connected-p) 'success 'error)))
 
 (defconst fastboot-dev-line "^\\\([[:alnum:]]+\\\)[[:space:]]+fastboot$")
 
