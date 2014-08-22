@@ -286,6 +286,10 @@ backend should have been registered with device-control-register-backend."
     (funcall (dctrl-backend-resume dctrl-backend))
     (dctrl-start)))
 
+(defun dctrl-kill-device (device-name)
+  (interactive (list (dctrl-complete-device)))
+  (kill-buffer (dctrl-get-buffer device-name)))
+
 ;; Mode
 (defvar device-control-mode-map nil
   "Keymap for device-control major mode.")
