@@ -308,7 +308,7 @@ Special commands:
 \\{device-control-mode-map}")
 
 ;; Tools
-(defun dctrl-build-fun-list (prefix)
+(defun dctrl-build-fun-list (prefix &optional face)
   "Build the alist (FUNCTION_NAME . FUNCTION) of all functions
 defined matching the given prefix. All get-actions() backend
 functions should use this."
@@ -316,14 +316,17 @@ functions should use this."
     (mapatoms (lambda (x)
 		(when (and (string-prefix-p prefix (symbol-name x))
 			   (symbol-function x))
-		  (nconc fun-list (list (cons (substring (symbol-name x)
-							 (length prefix)) x))))))
+		  (let ((name (propertize (substring (symbol-name x)
+						     (length prefix))
+					  'face face)))
+		    (nconc fun-list (list (cons name x)))))))
     (sort (cdr fun-list) (lambda (x y) (string< (car x) (car y))))))
 
 (defun dctrl-include-backend-in-name (cell)
   (let ((symname (symbol-name (cdr cell))))
     (string-match "dctrl-\\\([[:alnum:]]+\\\)-action" symname)
-    (setcar cell (concat (match-string 1 symname) ":" (car cell)))))
+    (setcar cell (propertize (concat (match-string 1 symname) ":" (car cell))
+			     'face (get-text-property 0 'face (car cell))))))
 
 (defun dctrl-agregate-fun-list (&rest lists)
   (let ((all (make-symbol "all")))

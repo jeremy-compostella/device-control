@@ -27,8 +27,12 @@
       (dctrl-untramp-file src))
     (append tramp-cmd (dctrl-adb-run "push" ctrlhost-filename dst))))
 
+(defun dctrl-adb-connected-p ()
+  (find dctrl-device-name (dctrl-adb-guess-device-names) :key 'string=))
+
 (defun dctrl-adb-get-actions ()
-  (dctrl-build-fun-list "dctrl-adb-action-"))
+  (dctrl-build-fun-list "dctrl-adb-action-"
+			(if (dctrl-adb-connected-p) 'success 'error)))
 
 (defconst adb-dev-line "^\\\([[:alnum:]]+\\\)[[:space:]]+device$")
 
