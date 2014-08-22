@@ -176,12 +176,18 @@ its functions available to device control."
 
 (defvar dctrl-last-used-device nil)	;TODO: make a list of used devices
 
+(defsubst dctrl-same-backend-same-host (buf1 buf2)
+  (and (string= (dctrl-backend-name (buffer-local-value 'dctrl-backend buf1))
+		(dctrl-backend-name (buffer-local-value 'dctrl-backend buf2)))
+       (string= (dctrl-get-buffer-hostname (buffer-local-value 'default-directory buf1))
+		(dctrl-get-buffer-hostname (buffer-local-value 'default-directory buf2)))))
+
 (defun dctrl-online-devices ()
-  (let ((backends (mapcar (curry 'buffer-local-value 'dctrl-backend) (dctrl-buffers))))
-    (let ((l '()))
-      (dolist (backend (delete-duplicates backends :key 'dctrl-backend-name :test 'string=))
-	(setq l (nconc l (funcall (dctrl-backend-guess-device-names backend)))))
-      l)))
+  (let ((bufs (delete-duplicates (dctrl-buffers) :test 'dctrl-same-backend-same-host)))
+    (apply 'append
+	   (mapcar (lambda (x) (funcall (dctrl-backend-guess-device-names
+					 (buffer-local-value 'dctrl-backend x))))
+		   bufs))))
 
 (defun dctrl-colorize-devices (devices)
   (let ((onlines (dctrl-online-devices)))
