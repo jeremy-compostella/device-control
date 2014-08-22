@@ -214,23 +214,31 @@ its functions available to device control."
 	  ((= 1 (length devices-list)) (car devices-list))
 	  ((ido-completing-read "Device: " (dctrl-smart-order devices-list))))))
 
+(defun dctrl-get-current-buffer-hostname ()
+  (let ((dir default-directory))
+    (or (and (tramp-tramp-file-p dir)
+	     (with-parsed-tramp-file-name dir info
+	       info-host))
+	"localhost")))
+
 ;; Interactives
-(defun device-control-start (&optional backend-name device-name)
+(defun device-control-start (&optional hostname backend-name device-name)
   "Create a device controller, requiring a backend type. The
 backend should have been registered with device-control-register-backend."
   (interactive)
-  (unless backend-name
-    (setq backend-name
-	  (ido-completing-read "Device control backend: "
-			       (mapcar 'dctrl-backend-name dctrl-backends))))
-  (unless device-name
-    (setq device-name
-	  (ido-completing-read "Device name: "
-			   (funcall (dctrl-backend-guess-device-names
-				     (dctrl-get-backend-by-name backend-name))))))
-  (when device-name
-    (dctrl-create-buffer device-name backend-name))
-  device-name)
+  (let ((hostname (or hostname (dctrl-get-current-buffer-hostname))))
+    (unless backend-name
+      (setq backend-name
+	    (ido-completing-read (format "Device control backend (on %s): " hostname)
+				 (mapcar 'dctrl-backend-name dctrl-backends))))
+    (unless device-name
+      (setq device-name
+	    (ido-completing-read (format "Device name (on %s): " hostname)
+				 (funcall (dctrl-backend-guess-device-names
+					   (dctrl-get-backend-by-name backend-name))))))
+    (when device-name
+      (dctrl-create-buffer device-name backend-name))
+    device-name))
 
 (defun device-control (device-name)
   "Enqueue a new action in the actions fifo for a device.
