@@ -51,11 +51,6 @@ the state the action FIFO should be put to after the action.
 ")
 (defvar-local dctrl-backend nil
   "The backend handling the controlled device.")
-(defvar-local dctrl-avail-actions nil
-  "The available actions of a device.
-This is an alist of (name . function), where :
-  - name is the string of the action name (provided to completion)
-  - function is the function called for this action")
 (defvar-local dctrl-state 'stopped
   "The action FIFO state for the controlled device.
 Might be 'stopped, 'running or 'sleep.")
@@ -158,7 +153,6 @@ its functions available to device control."
       (setq dctrl-state 'stopped
 	    dctrl-backend backend
 	    dctrl-device-name device-name
-	    dctrl-avail-actions (funcall (dctrl-backend-get-actions backend))
 	    dctrl-actions (copy-list dctrl-empty-fifo))
       (funcall (dctrl-backend-create dctrl-backend)))
     buf))
@@ -246,8 +240,8 @@ backend should have been registered with device-control-register-backend."
   (interactive (list (dctrl-complete-device)))
   (setq dctrl-last-used-device device-name)
   (with-current-buffer (dctrl-get-buffer device-name)
-    (let* ((actions dctrl-avail-actions)
 	   (action (ido-completing-read (format "Action (on %s): " device-name)
+    (let* ((actions (funcall (dctrl-backend-get-actions dctrl-backend)))
 					(mapcar 'car actions) nil t)))
       (nconc dctrl-actions (funcall (assoc-default action actions)))
       (dctrl-start))))
