@@ -84,10 +84,11 @@ its functions available to device control."
   (find backend-name dctrl-backends :test 'string= :key 'dctrl-backend-name))
 
 (defun dctrl-append-msg (msg &optional face)
-  (save-excursion-if-not-at-point-max (current-buffer)
-    (goto-char (point-max))
-    (insert (propertize (format-time-string "[%Y/%m/%d %H:%M:%S] " (current-time))
-			'face (or face 'font-lock-comment-face)) msg "\n")))
+  (let ((inhibit-read-only t))
+    (save-excursion-if-not-at-point-max (current-buffer)
+      (goto-char (point-max))
+      (insert (propertize (format-time-string "[%Y/%m/%d %H:%M:%S] " (current-time))
+			  'face (or face 'font-lock-comment-face)) msg "\n"))))
 
 (defun dctrl-msg (msg)
   (dctrl-append-msg msg))
@@ -322,7 +323,8 @@ backend should have been registered with device-control-register-backend."
   "device-control"
   "device-control major mode.
 Special commands:
-\\{device-control-mode-map}")
+\\{device-control-mode-map}"
+  (toggle-read-only t))
 
 ;; Tools
 (defun dctrl-build-fun-list (prefix &optional face)
@@ -366,9 +368,10 @@ functions should use this."
 
 (defun dctrl-process-filter (p str)
   (with-current-buffer (process-buffer p)
-    (save-excursion-if-not-at-point-max (current-buffer)
-      (goto-char (point-max))
-      (insert (replace-regexp-in-string "\r" "\n" str)))))
+    (let ((inhibit-read-only t))
+      (save-excursion-if-not-at-point-max (current-buffer)
+	(goto-char (point-max))
+	(insert (replace-regexp-in-string "\r" "\n" str))))))
 
 (defmacro dctrl-internal-run-process (args start-process-fun)
   `(lexical-let ((args args))
