@@ -208,8 +208,17 @@ its functions available to device control."
 	  ((= 1 (length devices-list)) (car devices-list))
 	  ((ido-completing-read "Device: " (dctrl-smart-order devices-list))))))
 
-(defun dctrl-get-current-buffer-hostname ()
-  (let ((dir default-directory))
+(defun dctrl-get-tramp-prefix (&optional dir)
+  (let ((dir (or dir default-directory)))
+    (or (and (tramp-tramp-file-p dir)
+	     (with-parsed-tramp-file-name dir info
+	       (concat "/" info-method ":"
+		       (if info-user (concat info-user "@") "")
+		       info-host ":")))
+	"")))
+
+(defun dctrl-get-buffer-hostname (&optional dir)
+  (let ((dir (or dir default-directory)))
     (or (and (tramp-tramp-file-p dir)
 	     (with-parsed-tramp-file-name dir info
 	       info-host))
@@ -220,7 +229,7 @@ its functions available to device control."
   "Create a device controller, requiring a backend type. The
 backend should have been registered with device-control-register-backend."
   (interactive)
-  (let ((hostname (or hostname (dctrl-get-current-buffer-hostname))))
+  (let ((hostname (or hostname (dctrl-get-buffer-hostname))))
     (unless backend-name
       (setq backend-name
 	    (ido-completing-read (format "Device control backend (on %s): " hostname)
@@ -240,8 +249,10 @@ backend should have been registered with device-control-register-backend."
   (interactive (list (dctrl-complete-device)))
   (setq dctrl-last-used-device device-name)
   (with-current-buffer (dctrl-get-buffer device-name)
-	   (action (ido-completing-read (format "Action (on %s): " device-name)
     (let* ((actions (funcall (dctrl-backend-get-actions dctrl-backend)))
+	   (action (ido-completing-read (format "Action (%s on %s): "
+						device-name
+						(dctrl-get-buffer-hostname))
 					(mapcar 'car actions) nil t)))
       (nconc dctrl-actions (funcall (assoc-default action actions)))
       (dctrl-start))))
