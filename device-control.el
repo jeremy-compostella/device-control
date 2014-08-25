@@ -56,6 +56,9 @@ the state the action FIFO should be put to after the action.
 Might be 'stopped, 'running or 'sleep.")
 (defvar-local dctrl-device-name nil
   "The device name provided at `device-control-start' time.")
+(defvar-local dctrl-automatic-mode nil
+  "Don't use any specific device, use the one which is currently
+connected indifferently.")
 
 ;; Backend interface
 ;; To be implemented by each backend with dctrl-backend-register().
@@ -146,15 +149,19 @@ its functions available to device control."
   (when (get-buffer-process (current-buffer))
     (kill-process)))
 
-(defun dctrl-create-buffer(device-name backend-name)
+(defun dctrl-create-buffer (device-name backend-name)
   (let ((buf (get-buffer-create (format dctrl-buf-fmt backend-name device-name)))
 	(backend (dctrl-get-backend-by-name backend-name)))
     (with-current-buffer buf
       (device-control-mode)
       (setq dctrl-state 'stopped
 	    dctrl-backend backend
-	    dctrl-device-name device-name
 	    dctrl-actions (copy-list dctrl-empty-fifo))
+      (if (string= device-name "automatic")
+	  (progn (setq dctrl-automatic-mode t)
+		 (setq dctrl-device-name (read-string "Give a name to your device: "))
+		 (rename-buffer (format dctrl-buf-fmt backend-name dctrl-device-name)))
+	  (setq dctrl-device-name device-name))
       (funcall (dctrl-backend-create dctrl-backend)))
     buf))
 
@@ -244,8 +251,9 @@ backend should have been registered with device-control-register-backend."
     (unless device-name
       (setq device-name
 	    (ido-completing-read (format "Device name (on %s): " hostname)
-				 (funcall (dctrl-backend-guess-device-names
-					   (dctrl-get-backend-by-name backend-name))))))
+				 (nconc '("automatic")
+					(funcall (dctrl-backend-guess-device-names
+						  (dctrl-get-backend-by-name backend-name)))))))
     (when device-name
       (dctrl-create-buffer device-name backend-name))
     device-name))
