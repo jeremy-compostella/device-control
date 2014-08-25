@@ -22,7 +22,7 @@
 	 (file file)
 	 tramp-cmd ctrlhost-filename)
     (unless (and file (file-exists-p file))
-      (setq file (ido-read-file-name "Fastboot file: " (dctrl-fastboot-aosp-out-dir)
+      (setq file (ido-read-file-name "File to flash: " (dctrl-fastboot-aosp-out-dir)
 				     (assoc-default type dctrl-fastboot-flash-alist) t)))
     (multiple-value-setq (tramp-cmd ctrlhost-filename)
       (dctrl-untramp-file file))
@@ -43,13 +43,25 @@
   (let* ((file file)
 	 tramp-cmd ctrlhost-filename)
     (unless (and file (file-exists-p file))
-      (setq file (ido-read-file-name "Kernel file: " (dctrl-fastboot-aosp-out-dir) "boot.img" t)))
+      (setq file (ido-read-file-name "Boot image: " (dctrl-fastboot-aosp-out-dir) "boot.img" t)))
     (multiple-value-setq (tramp-cmd ctrlhost-filename)
       (dctrl-untramp-file file))
     (append tramp-cmd
 	    (dctrl-fastboot-run "boot" (expand-file-name ctrlhost-filename)))))
 
-(defun dctrl-fastboot-action-flash-raw (&optional kernel ramdisk)) ;TODO
+(defun dctrl-fastboot-action-flash-raw (&optional kernel ramdisk)
+  (let ((dir (dctrl-fastboot-aosp-out-dir))
+	(kernel (or kernel (ido-read-file-name "Kernel file: " (dctrl-fastboot-aosp-out-dir) "kernel" t)))
+	(ramdisk (or ramdisk (ido-read-file-name "Ramdisk file: " (dctrl-fastboot-aosp-out-dir) "ramdisk.img" t)))
+	tramp-cmd1 tramp-cmd2 ctrlhost-kernel-filename ctrlhost-ramdisk-filename)
+    (multiple-value-setq (tramp-cmd1 ctrlhost-kernel-filename)
+      (dctrl-untramp-file kernel))
+    (multiple-value-setq (tramp-cmd2 ctrlhost-ramdisk-filename)
+      (dctrl-untramp-file ramdisk))
+    (append tramp-cmd1 tramp-cmd2
+	    (dctrl-fastboot-run "flash:raw"
+				(expand-file-name ctrlhost-kernel-filename)
+				(expand-file-name ctrlhost-ramdisk-filename)))))
 
 (defun dctrl-fastboot-action-continue ()
   (dctrl-fastboot-run "continue"))
