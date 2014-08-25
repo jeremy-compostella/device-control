@@ -57,7 +57,10 @@
   (dctrl-fastboot-run "reboot-bootloader"))
 
 (defun dctrl-fastboot-connected-p ()
-  (find dctrl-device-name (dctrl-fastboot-guess-device-names) :key 'string=))
+  (let ((devices (dctrl-fastboot-guess-device-names)))
+    (if dctrl-automatic-mode
+	devices
+      (find dctrl-device-name devices :key 'string=))))
 
 (defun dctrl-fastboot-get-actions ()
   (dctrl-build-fun-list "dctrl-fastboot-action-"
