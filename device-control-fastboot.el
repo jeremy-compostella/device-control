@@ -13,12 +13,16 @@
 				     ("recovery"	.	"recovery.img")
 				     ("system"		.	"system.img")))
 
+(defun dctrl-fastboot-aosp-out-dir ()
+  (when (and aosp-path aosp-board-name)
+    (concat aosp-path "/out/target/product/" aosp-board-name "/")))
+
 (defun dctrl-fastboot-action-flash (&optional type file)
   (let* ((type (or type (ido-completing-read "Type of flash: " (mapcar 'car dctrl-fastboot-flash-alist) nil t)))
 	 (file file)
 	 tramp-cmd ctrlhost-filename)
     (unless (and file (file-exists-p file))
-      (setq file (ido-read-file-name "Fastboot file: " nil
+      (setq file (ido-read-file-name "Fastboot file: " (dctrl-fastboot-aosp-out-dir)
 				     (assoc-default type dctrl-fastboot-flash-alist) t)))
     (multiple-value-setq (tramp-cmd ctrlhost-filename)
       (dctrl-untramp-file file))
@@ -39,7 +43,7 @@
   (let* ((file file)
 	 tramp-cmd ctrlhost-filename)
     (unless (and file (file-exists-p file))
-      (setq file (ido-read-file-name "Kernel file: " nil nil t)))
+      (setq file (ido-read-file-name "Kernel file: " (dctrl-fastboot-aosp-out-dir) "boot.img" t)))
     (multiple-value-setq (tramp-cmd ctrlhost-filename)
       (dctrl-untramp-file file))
     (append tramp-cmd
