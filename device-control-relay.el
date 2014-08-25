@@ -55,7 +55,7 @@
 (defun dctrl-relay-action-force-bootloader ()
   (nconc (dctrl-relay-action-force-shutdown)
 	 (dolist (cmd dctrl-relay-bootloader-combo)
-	   (dctrl-relay-send-command cmd))
+	   (dctrl-relay-send-command cmd t))
 	 (dctrl-relay-action-power-on)
 	 (dctrl-action-wait 10)
 	 (dolist (cmd dctrl-relay-bootloader-combo)
