@@ -84,8 +84,12 @@
   (when (dctrl-relay-connected-p)
     (dctrl-build-fun-list "dctrl-relay-action-" 'success)))
 
+(defun dctrl-relay-init ()
+  (setq dctrl-relay-status dctrl-relay-default-status))
+
 (dctrl-register-backend
  (make-dctrl-backend :name "relay"
+		     :create 'dctrl-relay-init
 		     :get-actions 'dctrl-fastboot-get-actions))
 
 (provide 'device-control-relay)
