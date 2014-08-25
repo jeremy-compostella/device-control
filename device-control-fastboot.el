@@ -64,7 +64,7 @@
   (let ((devices (dctrl-fastboot-guess-device-names)))
     (if dctrl-automatic-mode
 	devices
-      (find dctrl-device-name devices :key 'string=))))
+      (find dctrl-device-name devices :test 'string=))))
 
 (defun dctrl-fastboot-get-actions ()
   (dctrl-build-fun-list "dctrl-fastboot-action-"
