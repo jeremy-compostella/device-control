@@ -4,7 +4,9 @@
 
 (defun dctrl-adb-run (&rest args)
   (dctrl-run-process
-   (nconc (list adb-exec) (list "-s" dctrl-device-name) args)))
+   (nconc (list adb-exec) (if dctrl-automatic-mode
+			      '()
+			    (list "-s" dctrl-device-name)) args)))
 
 (defun dctrl-adb-action-reboot ()
   (dctrl-adb-run "reboot"))
