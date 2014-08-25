@@ -30,7 +30,10 @@
     (append tramp-cmd (dctrl-adb-run "push" ctrlhost-filename dst))))
 
 (defun dctrl-adb-connected-p ()
-  (find dctrl-device-name (dctrl-adb-guess-device-names) :key 'string=))
+  (let ((devices (dctrl-adb-guess-device-names)))
+    (if dctrl-automatic-mode
+	devices
+      (find dctrl-device-name devices :key 'string=))))
 
 (defun dctrl-adb-get-actions ()
   (dctrl-build-fun-list "dctrl-adb-action-"
