@@ -33,6 +33,8 @@
 ;; This package only works for Emacs 24 and higher.
 
 (require 'ido)
+(require 'cl)
+(require 'tramp)
 
 (defconst dctrl-buf-fmt "*dctrl:%s-%s*")
 
@@ -255,8 +257,8 @@ backend should have been registered with device-control-register-backend."
 					(funcall (dctrl-backend-guess-device-names
 						  (dctrl-get-backend-by-name backend-name)))))))
     (when device-name
-      (dctrl-create-buffer device-name backend-name))
-    device-name))
+      (with-current-buffer (dctrl-create-buffer device-name backend-name)
+	dctrl-device-name))))
 
 (defun device-control (device-name)
   "Enqueue a new action in the actions fifo for a device.
@@ -458,6 +460,11 @@ In all cases, returns a list of :
   (lexical-let ((function function)
 		(arguments arguments))
     (lambda (&rest more) (apply function (append arguments more)))))
+
+(defsubst rcurry (function &rest arguments)
+  (lexical-let ((function function)
+		(arguments arguments))
+    (lambda (&rest more) (apply function (append more arguments)))))
 
 (defmacro save-excursion-if-not-at-point-max (buf &rest body)
   (declare (indent 1))
