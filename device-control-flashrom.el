@@ -1,7 +1,7 @@
 (require 'device-control)
 
 (defvar flashrom-exec "flashrom")
-(defvar flashrom-device-id "0483:dada")
+(defvar flashrom-device-id ".*0483:dada.*")
 
 (defun dctrl-flashrom-run (&rest args)
   (dctrl-run-process
