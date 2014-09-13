@@ -325,7 +325,8 @@ backend should have been registered with device-control-register-backend."
   (define-key device-control-mode-map "c" 'dctrl-cancel)
   (define-key device-control-mode-map "C" 'dctrl-cancel-and-clear)
   (define-key device-control-mode-map "p" 'dctrl-pause)
-  (define-key device-control-mode-map "r" 'dctrl-resume))
+  (define-key device-control-mode-map "r" 'dctrl-resume)
+  (define-key device-control-mode-map "q" 'quit-window))
 
 (define-derived-mode device-control-mode fundamental-mode
   "device-control"
