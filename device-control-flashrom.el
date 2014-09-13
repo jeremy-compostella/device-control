@@ -12,7 +12,8 @@
 	tramp-cmd ctrlhost-filename)
     (multiple-value-setq (tramp-cmd ctrlhost-filename)
       (dctrl-untramp-file file))
-    (dctrl-flashrom-run (expand-file-name ctrlhost-filename))))
+    (append tramp-cmd
+	    (dctrl-flashrom-run (expand-file-name ctrlhost-filename)))))
 
 (defun dctrl-flashrom-device-present-p ()
   (delq nil (mapcar (lambda (line)
