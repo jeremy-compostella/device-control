@@ -358,7 +358,9 @@ functions should use this."
 
 (defun dctrl-agregate-fun-list (&rest lists)
   (let ((all (make-symbol "all")))
-    (setq all (sort (apply 'append lists) (lambda (x y) (string< (car x) (car y)))))
+    (setq all (sort (apply 'append lists)
+                    (lambda (x y) (and (eq 'success (get-text-property 0 'face (car x)))
+                                       (eq 'error (get-text-property 0 'face (car y)))))))
     (let ((cur all))
       (while (cdr cur)
 	(when (string= (caar cur) (caadr cur))
