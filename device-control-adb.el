@@ -2,6 +2,8 @@
 
 (defvar adb-exec "adb")
 
+(defvar adb-push-file-history '())
+
 (defun dctrl-adb-run (&rest args)
   (dctrl-run-process
    (nconc (list adb-exec) (if dctrl-automatic-mode
@@ -22,7 +24,8 @@
 		 "android.intent.action.ACTION_REQUEST_SHUTDOWN"))
 
 (defun dctrl-adb-action-push-file (&optional filename dst-filename)
-  (let* ((src (or filename (ido-read-file-name "Source: ")))
+  (let* ((ido-file-history 'adb-push-file-history)
+	 (src (or filename (ido-read-file-name "Source: " )))
 	 (dst (or dst-filename (read-string "Target: " nil)))
 	 tramp-cmd ctrlhost-filename)
     (multiple-value-setq (tramp-cmd ctrlhost-filename)
