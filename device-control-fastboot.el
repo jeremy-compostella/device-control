@@ -39,6 +39,12 @@
   (let ((partition (or partition (ido-completing-read "Partition name: " dctrl-fastboot-partition-list nil t))))
     (dctrl-fastboot-run "format" partition)))
 
+(defvar dctrl-fastboot-oem-actions-list '("lock" "unlock" "verified"))
+
+(defun dctrl-fastboot-action-oem (&optional action)
+  (let ((action (or action (ido-completing-read "Action: " dctrl-fastboot-oem-actions-list nil t))))
+    (dctrl-fastboot-run "oem" action)))
+
 (defun dctrl-fastboot-action-boot (&optional file)
   (let* ((file file)
 	 tramp-cmd ctrlhost-filename)
