@@ -289,8 +289,6 @@ backend should have been registered with device-control-register-backend."
   "Cancel the current action and pause the fifo execution."
   (interactive (list (dctrl-complete-device 'running)))
   (with-current-buffer (dctrl-get-buffer device-name)
-    (unless (eq dctrl-state 'running)
-      (error "device-control: selected control buffer is not in correct state."))
     (dctrl-kill-current)
     (dctrl-stop 'clear)
     (dctrl-warn "Actions FIFO execution canceled and FIFO cleared.")))
