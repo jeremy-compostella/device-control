@@ -151,7 +151,7 @@ its functions available to device control."
   (when (get-buffer-process (current-buffer))
     (kill-process)))
 
-(defun dctrl-create-buffer (device-name backend-name)
+(defun dctrl-create-buffer (device-name backend-name hostname)
   (let ((buf (get-buffer-create (format dctrl-buf-fmt backend-name device-name)))
 	(backend (dctrl-get-backend-by-name backend-name)))
     (with-current-buffer buf
@@ -159,6 +159,9 @@ its functions available to device control."
       (setq dctrl-state 'stopped
 	    dctrl-backend backend
 	    dctrl-actions (copy-list dctrl-empty-fifo))
+      (if (string= "localhost" hostname)
+	  (setq default-directory "~")
+	(setq default-directory (format "/ssh:%s:" hostname)))
       (if (string= device-name "automatic")
 	  (progn (setq dctrl-automatic-mode t)
 		 (setq dctrl-device-name (read-string "Give a name to your device: "))
@@ -257,7 +260,7 @@ backend should have been registered with device-control-register-backend."
 					(funcall (dctrl-backend-guess-device-names
 						  (dctrl-get-backend-by-name backend-name)))))))
     (when device-name
-      (with-current-buffer (dctrl-create-buffer device-name backend-name)
+      (with-current-buffer (dctrl-create-buffer device-name backend-name hostname)
 	dctrl-device-name))))
 
 (defun device-control (device-name)
@@ -357,10 +360,8 @@ functions should use this."
 			     'face (get-text-property 0 'face (car cell))))))
 
 (defun dctrl-agregate-fun-list (&rest lists)
-  (let ((all (make-symbol "all")))
-    (setq all (sort (apply 'append lists)
-                    (lambda (x y) (and (eq 'success (get-text-property 0 'face (car x)))
-                                       (eq 'error (get-text-property 0 'face (car y)))))))
+  (let ((all (sort (apply 'append lists)
+		   (lambda (x y) (string< (car x) (car y))))))
     (let ((cur all))
       (while (cdr cur)
 	(when (string= (caar cur) (caadr cur))
@@ -368,7 +369,8 @@ functions should use this."
 	    (dctrl-include-backend-in-name (car cur))
 	    (dctrl-include-backend-in-name (cadr cur))))
 	(setq cur (cdr cur))))
-    all))
+    (sort all (lambda (x y) (and (eq 'success (get-text-property 0 'face (car x)))
+				 (eq 'error (get-text-property 0 'face (car y))))))))
 
 (defun dctrl-process-sentinel (p e)
   (with-current-buffer (process-buffer p)
