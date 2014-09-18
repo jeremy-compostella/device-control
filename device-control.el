@@ -198,8 +198,9 @@ its functions available to device control."
 (defun dctrl-online-devices ()
   (let ((bufs (delete-duplicates (dctrl-buffers) :test 'dctrl-same-backend-same-host)))
     (apply 'append
-	   (mapcar (lambda (x) (funcall (dctrl-backend-guess-device-names
-					 (buffer-local-value 'dctrl-backend x))))
+	   (mapcar (lambda (x) (with-current-buffer x
+				 (funcall (dctrl-backend-guess-device-names
+					   (buffer-local-value 'dctrl-backend x)))))
 		   bufs))))
 
 (defun dctrl-colorize-devices (devices)
