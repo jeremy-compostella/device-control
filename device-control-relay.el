@@ -6,10 +6,10 @@
 				      "usb-FTDI_FT232R_USB_UART_A1009ZG8-*"))
 
 (defvar dctrl-relay-map
-  '((power	.	( ?i . ?s))
-    (plug	.	( ?t . ?j))
-    (vol-down	.	( ?l . ?v))
-    (vol-up	.	( ?k . ?u))))
+  '((power	.	( ?i . ?s ))
+    (plug	.	( ?t . ?j ))
+    (vol-down	.	( ?l . ?v ))
+    (vol-up	.	( ?k . ?u ))))
 
 (defvar dctrl-relay-status-default
   (mapcar (lambda (x) (cons (car x) nil)) dctrl-relay-map))
@@ -41,25 +41,31 @@
 (defun dctrl-relay-action-force-shutdown ()
   (nconc (dctrl-relay-send-command 'power t)
 	 (dctrl-action-wait 11)
-	 (dctrl-relay-toggle-command 'power)))
+	 (dctrl-relay-send-command 'power nil)))
 
 (defun dctrl-relay-action-power-on ()
   (nconc (dctrl-relay-send-command 'power t)
 	 (dctrl-action-wait 3)
-	 (dctrl-relay-toggle-command 'power)))
+	 (dctrl-relay-send-command 'power nil)))
 
 (defun dctrl-relay-action-force-reboot ()
   (nconc (dctrl-relay-action-force-shutdown)
 	 (dctrl-relay-action-power-on)))
 
+(defun dctrl-relay-action-usb-plug ()
+  (dctrl-relay-send-command 'plug t))
+
+(defun dctrl-relay-action-usb-unplug ()
+  (dctrl-relay-send-command 'plug nil))
+
 (defun dctrl-relay-action-force-bootloader ()
   (nconc (dctrl-relay-action-force-shutdown)
-	 (dolist (cmd dctrl-relay-bootloader-combo)
-	   (dctrl-relay-send-command cmd t))
+	 (apply 'nconc (mapcar (rcurry 'dctrl-relay-send-command t)
+			dctrl-relay-bootloader-combo))
 	 (dctrl-relay-action-power-on)
 	 (dctrl-action-wait 10)
-	 (dolist (cmd dctrl-relay-bootloader-combo)
-	   (dctrl-relay-toggle-command cmd))))
+	 (apply 'nconc (mapcar (rcurry 'dctrl-relay-send-command nil)
+			       dctrl-relay-bootloader-combo))))
 
 (defun dctrl-relay-select-device ()
   (let* ((prefix (concat (dctrl-get-tramp-prefix) dctrl-relay-device-prefix))
