@@ -62,6 +62,9 @@ Might be 'stopped, 'running or 'sleep.")
   "Don't use any specific device, use the one which is currently
 connected indifferently.")
 
+(defvar device-control-action-history '()
+  "History of actions.")
+
 ;; Backend interface
 ;; To be implemented by each backend with dctrl-backend-register().
 (defstruct dctrl-backend
@@ -274,7 +277,8 @@ backend should have been registered with device-control-register-backend."
 	   (action (ido-completing-read (format "Action (%s on %s): "
 						device-name
 						(dctrl-get-buffer-hostname))
-					(mapcar 'car actions) nil t)))
+					(mapcar 'car actions) nil t nil
+					'device-control-action-history)))
       (nconc dctrl-actions (funcall (assoc-default action actions)))
       (dctrl-start))))
 
