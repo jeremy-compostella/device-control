@@ -4,6 +4,7 @@
 (defvar dctrl-relay-device-prefix "/dev/serial/by-id/")
 (defvar dctrl-relay-default-devices '("usb-Devantech_Ltd._USB-RLY08*"
 				      "usb-FTDI_FT232R_USB_UART_A1009ZG8-*"))
+(defvar dctrl-quick-press-time "0.2")
 
 (defvar dctrl-relay-map
   '((power	.	( ?i . ?s ))
@@ -18,6 +19,15 @@
 (defvar dctrl-relay-default-status (mapcar (lambda (x) (cons (car x) nil)) dctrl-relay-map))
 (defvar-local dctrl-relay-status '())
 
+(defun dctrl-relay-run-double (k1 k2)
+  (dctrl-run-process
+   (nconc (list "sh" "-c"
+		(mapconcat 'identity
+			   (append (list "echo") (list k1) (list ">" dctrl-relay-device)
+				   (list (format "; sleep %s; " dctrl-quick-press-time))
+				   (list "echo") (list k2) (list ">" dctrl-relay-device))
+			   " ")))))
+
 (defun dctrl-relay-run (&rest args)
   (dctrl-run-process
    (nconc (list "sh" "-c"
@@ -25,10 +35,14 @@
 			   (append (list "echo") args (list ">" dctrl-relay-device))
 			   " ")))))
 
-(defun dctrl-relay-send-command (cmd pushp)
+(defun dctrl-relay-send-command (cmd push-type)
   (let ((keys (assoc-default cmd dctrl-relay-map)))
-    (setcdr (assoc cmd dctrl-relay-status) pushp)
-    (dctrl-relay-run (char-to-string (if pushp (car keys) (cdr keys))))))
+    (if (eq push-type 'quick-press)
+	(dctrl-relay-run-double (char-to-string (car keys)) (char-to-string (cdr keys)))
+	(progn
+	  (setcdr (assoc cmd dctrl-relay-status) push-type)
+	  (dctrl-relay-run (char-to-string (if push-type (car keys) (cdr keys))))))))
+
 
 (defun dctrl-relay-toggle-command (cmd)
   (unless dctrl-relay-status
@@ -57,6 +71,10 @@
 
 (defun dctrl-relay-action-usb-unplug ()
   (dctrl-relay-send-command 'plug nil))
+
+(defun dctrl-relay-action-keypress ()
+  (let ((key (ido-completing-read "Key: " (mapcar (lambda(x)(symbol-name (car x))) dctrl-relay-map))))
+    (dctrl-relay-send-command (intern key) 'quick-press)))
 
 (defun dctrl-relay-action-force-bootloader ()
   (nconc (dctrl-relay-action-force-shutdown)
