@@ -11,7 +11,8 @@
 (defvar dctrl-fastboot-flash-alist '(("boot"		.	"boot.img")
 				     ("bootloader"	.	"bootloader.img")
 				     ("recovery"	.	"recovery.img")
-				     ("system"		.	"system.img")))
+				     ("system"		.	"system.img")
+				     ("zimage"		.	"kernel")))
 
 (defun dctrl-fastboot-aosp-out-dir ()
   (when (and aosp-path aosp-board-name)
