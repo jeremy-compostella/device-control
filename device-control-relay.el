@@ -101,7 +101,7 @@
 					   nil))
 	      ((setq dctrl-relay-device (concat dctrl-relay-device-prefix dev))
 	       (message "default-directory: %s" default-directory)
-	       (process-file "stty" nil "*Messages*" nil "-F" dctrl-relay-device
+	       (process-file "stty" nil nil nil "-F" dctrl-relay-device
 			     (number-to-string dctrl-relay-default-rate))))))))
 
 (defun dctrl-relay-connected-p ()
