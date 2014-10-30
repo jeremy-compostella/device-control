@@ -4,6 +4,8 @@
 (defvar dctrl-relay-device-prefix "/dev/serial/by-id/")
 (defvar dctrl-relay-default-devices '("usb-Devantech_Ltd._USB-RLY08*"
 				      "usb-FTDI_FT232R_USB_UART_A1009ZG8-*"))
+(defvar dctrl-relay-default-rate 19200)
+
 (defvar dctrl-quick-press-time "0.2")
 
 (defvar dctrl-relay-map
@@ -97,7 +99,10 @@
 				      nil t)))
 	(cond ((string= dev "none") (progn (setq dctrl-relay-device 'none)
 					   nil))
-	      ((setq dctrl-relay-device (concat dctrl-relay-device-prefix dev))))))))
+	      ((setq dctrl-relay-device (concat dctrl-relay-device-prefix dev))
+	       (message "default-directory: %s" default-directory)
+	       (process-file "stty" nil "*Messages*" nil "-F" dctrl-relay-device
+			     (number-to-string dctrl-relay-default-rate))))))))
 
 (defun dctrl-relay-connected-p ()
   (cond ((eq dctrl-relay-device 'none) nil)
