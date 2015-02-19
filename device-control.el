@@ -457,8 +457,8 @@ In all cases, returns a list of :
      ; Transfering remote src-host:file to dst-host:/tmp
      (t
       (setq xfer 'dctrl-run-process
-	    cmd (list "scp" src-filename
-		      (format "%s%s:%s" dst-user dst-host dst-filename))
+	    cmd (list "scp" (format "%s%s:%s" src-user src-host src-filename)
+		      dst-filename)
 	    final-filename dst-filename)))
     (if xfer
 	(list (apply xfer (list cmd)) final-filename)
