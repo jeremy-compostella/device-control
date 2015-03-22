@@ -75,7 +75,7 @@
   (dctrl-relay-send-command 'plug nil))
 
 (defun dctrl-relay-action-keypress ()
-  (let ((key (ido-completing-read "Key: " (mapcar (lambda(x)(symbol-name (car x))) dctrl-relay-map))))
+  (let ((key (ido-completing-read "Key: " (mapcar (lambda(x) (symbol-name (car x))) dctrl-relay-map))))
     (dctrl-relay-send-command (intern key) 'quick-press)))
 
 (defun dctrl-relay-action-force-bootloader ()
