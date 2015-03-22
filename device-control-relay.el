@@ -1,6 +1,9 @@
 (require 'device-control)
 
-(defvar dctrl-relay-bootloader-combo '(vol-down vol-up))
+(defvar dctrl-relay-dnx-combo '(vol-down vol-up))
+(defvar dctrl-relay-dnx-delay 6)
+(defvar dctrl-relay-bootloader-combo '(vol-down))
+(defvar dctrl-relay-bootloader-delay 6)
 (defvar dctrl-relay-device-prefix "/dev/serial/by-id/")
 (defvar dctrl-relay-default-devices '("usb-Devantech_Ltd._USB-RLY08*"
 				      "usb-FTDI_FT232R_USB_UART_A1009ZG8-*"))
@@ -78,14 +81,18 @@
   (let ((key (ido-completing-read "Key: " (mapcar (lambda(x) (symbol-name (car x))) dctrl-relay-map))))
     (dctrl-relay-send-command (intern key) 'quick-press)))
 
-(defun dctrl-relay-action-force-bootloader ()
+(defun dctrl-relay-force (combo delay)
   (nconc (dctrl-relay-action-force-shutdown)
-	 (apply 'nconc (mapcar (rcurry 'dctrl-relay-send-command t)
-			dctrl-relay-bootloader-combo))
+	 (apply 'nconc (mapcar (rcurry 'dctrl-relay-send-command t) combo))
 	 (dctrl-relay-action-power-on)
-	 (dctrl-action-wait 10)
-	 (apply 'nconc (mapcar (rcurry 'dctrl-relay-send-command nil)
-			       dctrl-relay-bootloader-combo))))
+	 (dctrl-action-wait delay)
+	 (apply 'nconc (mapcar (rcurry 'dctrl-relay-send-command nil) combo))))
+
+(defun dctrl-relay-action-force-bootloader ()
+  (dctrl-relay-force dctrl-relay-bootloader-combo dctrl-relay-bootloader-delay))
+
+(defun dctrl-relay-action-force-dnx ()
+  (dctrl-relay-force dctrl-relay-dnx-combo dctrl-relay-dnx-delay))
 
 (defun dctrl-relay-select-device ()
   (let* ((prefix (concat (dctrl-get-tramp-prefix) dctrl-relay-device-prefix))
