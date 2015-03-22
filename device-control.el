@@ -64,6 +64,8 @@ connected indifferently.")
 
 (defvar device-control-action-history '()
   "History of actions.")
+(defvar dctrl-hostname-history '()
+  "History of hostname.")
 
 ;; Backend interface
 ;; To be implemented by each backend with dctrl-backend-register().
@@ -252,7 +254,8 @@ its functions available to device control."
   "Create a device controller, requiring a backend type. The
 backend should have been registered with device-control-register-backend."
   (interactive)
-  (let ((hostname (or hostname (read-string "Hostname: " (dctrl-get-buffer-hostname)))))
+  (let ((hostname (or hostname (read-string "Hostname: " (dctrl-get-buffer-hostname)
+					    'dctrl-hostname-history))))
     (unless backend-name
       (setq backend-name
 	    (ido-completing-read (format "Device control backend (on %s): " hostname)
