@@ -35,6 +35,7 @@
 (require 'ido)
 (require 'cl)
 (require 'tramp)
+(require 'notifications)
 
 (defconst dctrl-buf-fmt "*dctrl:%s-%s*")
 
@@ -104,6 +105,9 @@ its functions available to device control."
   (dctrl-append-msg msg))
 
 (defun dctrl-headline-msg (msg)
+  (notifications-notify :app-name "DeviceControl"
+			:title "Device control"
+			:body msg)
   (dctrl-append-msg (propertize msg 'face 'success)))
 
 (defun dctrl-error (msg)
