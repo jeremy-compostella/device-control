@@ -32,6 +32,25 @@
       (dctrl-untramp-file src))
     (append tramp-cmd (dctrl-adb-run "push" ctrlhost-filename dst))))
 
+(defun dctrl-adb-aosp-out-dir ()
+  (when (and aosp-path aosp-board-name)
+    (concat aosp-path "/out/target/product/" aosp-board-name "/")))
+
+(defun dctrl-adb-action-ota (&optional file)
+  (let ((file file)
+	tramp-cmd ctrlhost-filename)
+    (unless (and file (file-exists-p file))
+      (setq file (ido-read-file-name "File to flash: " (dctrl-adb-aosp-out-dir))))
+    (multiple-value-setq (tramp-cmd ctrlhost-filename)
+      (dctrl-untramp-file file))
+    (append tramp-cmd
+	    (dctrl-adb-run "root")
+	    (dctrl-action-wait 2)
+	    (dctrl-adb-run "push" (expand-file-name ctrlhost-filename) "/data/local/tmp/update.zip")
+	    (dctrl-adb-run "shell" "mkdir" "-p" "/cache/recovery")
+	    (dctrl-adb-run "shell" "echo '--update_package=/data/local/tmp/update.zip' > /cache/recovery/command")
+	    (dctrl-adb-run "shell" "start" "pre-recovery"))))
+
 (defun dctrl-adb-connected-p ()
   (let ((devices (dctrl-adb-guess-device-names)))
     (if dctrl-automatic-mode
