@@ -454,7 +454,7 @@ In all cases, returns a list of :
      ; Transfering local file to remote dst-host:/tmp
      ((not src-host)
       (setq xfer 'dctrl-run-local-process
-	    cmd (list "scp" src-filename
+	    cmd (list "scp" (expand-file-name src-filename)
 		      (format "%s%s:%s" dst-user dst-host dst-filename))
 	    final-filename dst-filename))
      ; Transfering remote src-host:file to dst-host:/tmp
