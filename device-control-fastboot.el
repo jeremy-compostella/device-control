@@ -12,6 +12,7 @@
 				     ("bootloader"	.	"bootloader.img")
 				     ("recovery"	.	"recovery.img")
 				     ("system"		.	"system.img")
+				     ("vendor"		.	"vendor.img")
 				     ("zimage"		.	"kernel")))
 
 (defun dctrl-fastboot-aosp-out-dir ()
