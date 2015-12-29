@@ -47,6 +47,13 @@
   (let ((action (or action (ido-completing-read "Action: " dctrl-fastboot-oem-actions-list nil t))))
     (dctrl-fastboot-run "oem" action)))
 
+(defvar dctrl-fastboot-flashing-actions-list '("lock" "unlock"))
+
+(defun dctrl-fastboot-action-flashing (&optional action)
+  (let ((action (or action (ido-completing-read "Action: " dctrl-fastboot-flashing-actions-list nil t))))
+    (dctrl-fastboot-run "flashing" action)))
+
+
 (defun dctrl-fastboot-action-boot (&optional file)
   (let* ((file file)
 	 tramp-cmd ctrlhost-filename)
