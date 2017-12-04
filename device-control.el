@@ -62,6 +62,8 @@ Might be 'stopped, 'running or 'sleep.")
 (defvar-local dctrl-automatic-mode nil
   "Don't use any specific device, use the one which is currently
 connected indifferently.")
+(defvar-local dctrl-prev-notif-id nil
+  "Previous notification ID.")
 
 (defvar device-control-action-history '()
   "History of actions.")
@@ -105,9 +107,12 @@ its functions available to device control."
   (dctrl-append-msg msg))
 
 (defun dctrl-headline-msg (msg)
-  (notifications-notify :app-name "DeviceControl"
-			:title "Device control"
-			:body msg)
+  (when dctrl-prev-notif-id
+    (notifications-close-notification dctrl-prev-notif-id))
+  (setq dctrl-prev-notif-id
+	(notifications-notify :app-name "DeviceControl"
+			      :title "Device control"
+			      :body msg))
   (dctrl-append-msg (propertize msg 'face 'success)))
 
 (defun dctrl-error (msg)
@@ -128,7 +133,7 @@ its functions available to device control."
       (let ((type (funcall action)))
 	(cond ((eq type 'continue) (dctrl-continue))
 	      ((eq type 'sleep))
-	      (dctrl-stop 'failure type))))))
+	      (t (dctrl-stop 'failure type)))))))
 
 (defun dctrl-start ()
   (unless (eq dctrl-state 'running)
