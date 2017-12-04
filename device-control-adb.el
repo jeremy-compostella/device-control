@@ -13,6 +13,9 @@
 (defun dctrl-adb-action-reboot ()
   (dctrl-adb-run "reboot"))
 
+(defun dctrl-adb-action-root ()
+  (dctrl-adb-run "root"))
+
 (defvar dctrl-adb-reboot-target '("" "bootloader" "recovery"))
 
 (defun dctrl-adb-action-reboot (&optional target)
