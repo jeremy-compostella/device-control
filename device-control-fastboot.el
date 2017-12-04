@@ -13,7 +13,9 @@
 				     ("recovery"	.	"recovery.img")
 				     ("system"		.	"system.img")
 				     ("vendor"		.	"vendor.img")
-				     ("zimage"		.	"kernel")))
+				     ("zimage"		.	"kernel")
+				     ("kernel"		.	"kernel")
+				     ("ramdisk"		.	"ramdisk.img")))
 
 (defun dctrl-fastboot-aosp-out-dir ()
   (when (and aosp-path aosp-board-name)
