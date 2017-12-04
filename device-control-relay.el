@@ -6,7 +6,7 @@
 (defvar dctrl-relay-bootloader-delay 6)
 (defvar dctrl-relay-device-prefix "/dev/serial/by-id/")
 (defvar dctrl-relay-default-devices '("usb-Devantech_Ltd._USB-RLY08*"
-				      "usb-FTDI_FT232R_USB_UART_A1009ZG8-*"))
+				      "usb-FTDI_FT232R_USB_UART_*"))
 (defvar dctrl-relay-default-rate 19200)
 
 (defvar dctrl-quick-press-time "0.2")
