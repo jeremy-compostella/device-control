@@ -40,10 +40,14 @@
 (require 'notifications)
 
 (defcustom dctrl-icon nil
-  "Path to an graphic file that the `device-control' module can
-use.")
+  "Path to graphic file to be used as `device-control' module
+notification icon."
+  :group 'device-control)
 
-(defconst dctrl-buf-fmt "*dctrl:%s-%s*")
+
+(defconst dctrl-buf-fmt "*dctrl:%s-%s*"
+  "Device Control buffer name format.  The first string is the
+backend name and the second string is the device name.")
 
 (defvar dctrl-backends '()
   "List of regitered backends through `dctrl-register-backend'.")
