@@ -31,7 +31,7 @@
 
 (defun dctrl-adb-action-push-file (&optional filename dst-filename)
   (let* ((ido-file-history 'adb-push-file-history)
-	 (src (or filename (ido-read-file-name "Source: " )))
+	 (src (expand-file-name (or filename (ido-read-file-name "Source: " ))))
 	 (dst (or dst-filename (read-string "Target: " nil)))
 	 tramp-cmd ctrlhost-filename)
     (multiple-value-setq (tramp-cmd ctrlhost-filename)
