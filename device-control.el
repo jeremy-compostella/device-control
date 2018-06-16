@@ -115,15 +115,25 @@ its functions available to device control."
 (defun dctrl-get-backend-by-name (backend-name)
   (find backend-name dctrl-backends :test 'string= :key 'dctrl-backend-name))
 
-(defun dctrl-append-msg (msg &optional face)
-  (let ((inhibit-read-only t))
-    (save-excursion-if-not-at-point-max (current-buffer)
-      (goto-char (point-max))
-      (insert (propertize (format-time-string "[%Y/%m/%d %H:%M:%S] " (current-time))
-			  'face (or face 'font-lock-comment-face)) msg "\n"))))
+(defun dctrl-append (&rest args)
+  (let ((inhibit-read-only t)
+	(return-position))
+    (unless (= (point-max) (point))
+      (setq return-position (point))
+      (goto-char (point-max)))
+    (apply 'insert args)
+    (if return-position
+	(goto-char return-position)
+      (when (get-buffer-window (current-buffer))
+	(set-window-point (get-buffer-window (current-buffer)) (point-max))))))
 
-(defun dctrl-msg (msg)
-  (dctrl-append-msg msg))
+(defsubst dctrl-current-time-string ()
+  (propertize (format-time-string dctrl-time-format (current-time))
+	      'face 'font-lock-comment-face))
+
+(defun dctrl-msg (msg &optional face)
+  (dctrl-append (dctrl-current-time-string) " "
+		(propertize msg 'face face) "\n"))
 
 (defun dctrl-headline-msg (msg)
   (when dctrl-prev-notif-id
@@ -135,14 +145,14 @@ its functions available to device control."
 	       :body msg
 	       (when dctrl-icon
 		 (list :app-icon dctrl-icon))))
-  (dctrl-append-msg (propertize msg 'face 'success)))
+  (dctrl-msg msg 'success))
 
 (defun dctrl-error (msg)
-  (dctrl-append-msg (propertize msg 'face 'error))
+  (dctrl-msg msg 'error)
   (error msg))
 
 (defun dctrl-warn (msg)
-  (dctrl-append-msg (propertize msg 'face 'font-lock-warning-face))
+  (dctrl-msg msg 'warning)
   (message "device-control: %s" msg))
 
 ;; Actions FIFO management
@@ -420,10 +430,7 @@ functions should use this."
 
 (defun dctrl-process-filter (p str)
   (with-current-buffer (process-buffer p)
-    (let ((inhibit-read-only t))
-      (save-excursion-if-not-at-point-max (current-buffer)
-	(goto-char (point-max))
-	(insert (replace-regexp-in-string "\r" "\n" str))))))
+    (dctrl-append (replace-regexp-in-string "\r" "\n" str))))
 
 (defmacro dctrl-internal-run-process (args start-process-fun)
   `(lexical-let ((args args))
@@ -507,13 +514,5 @@ In all cases, returns a list of :
   (lexical-let ((function function)
 		(arguments arguments))
     (lambda (&rest more) (apply function (append more arguments)))))
-
-(defmacro save-excursion-if-not-at-point-max (buf &rest body)
-  (declare (indent 1))
-  `(if (= (point-max) (point))
-       (progn ,@body
-              (when (get-buffer-window ,buf)
-                (set-window-point (get-buffer-window ,buf) (point-max))))
-     (save-excursion (progn ,@body))))
 
 (provide 'device-control)
