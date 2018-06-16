@@ -26,18 +26,16 @@
 
 ;;; Commentary:
 
-;; This package provide control a device such as an Android device, would it be
-;; locally connected or remotely connected through tramp.  The "control" relies
-;; on a backend, which provides commands available on the device.
-;; Notes:
-;; -----
-;;
-;; This package only works for Emacs 24 and higher.
+;; This package provides control of a device such as an Android
+;; device, would it be locally connected or remotely connected through
+;; tramp.  The "control" relies on a backend, which provides commands
+;; available on the device.
 
-(require 'ido)
 (require 'cl)
-(require 'tramp)
+(require 'font-lock)
+(require 'ido)
 (require 'notifications)
+(require 'tramp)
 
 (defgroup device-control nil
   "Provide control of a locally or remotely connected device."
@@ -60,7 +58,9 @@ backend name and the second string is the device name.")
 
 (defvar dctrl-backends '()
   "List of regitered backends through `dctrl-register-backend'.")
+
 (defconst dctrl-empty-fifo (cons 'dctrl-actions nil))
+
 (defvar-local dctrl-actions (copy-list dctrl-empty-fifo)
   "FIFO of actions to perform on a device.
 Normally this list is fully populated with `dctrl-run-process'
