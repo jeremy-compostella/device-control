@@ -37,6 +37,10 @@
 (require 'tramp)
 (require 'notifications)
 
+(defcustom dctrl-icon nil
+  "Path to an graphic file that the `device-control' module can
+use.")
+
 (defconst dctrl-buf-fmt "*dctrl:%s-%s*")
 
 (defvar dctrl-backends '()
@@ -110,9 +114,12 @@ its functions available to device control."
   (when dctrl-prev-notif-id
     (notifications-close-notification dctrl-prev-notif-id))
   (setq dctrl-prev-notif-id
-	(notifications-notify :app-name "DeviceControl"
-			      :title "Device control"
-			      :body msg))
+	(apply 'notifications-notify
+	       :app-name "DeviceControl"
+	       :title "Device control"
+	       :body msg
+	       (when dctrl-icon
+		 (list :app-icon dctrl-icon))))
   (dctrl-append-msg (propertize msg 'face 'success)))
 
 (defun dctrl-error (msg)
