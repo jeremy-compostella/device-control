@@ -1,9 +1,11 @@
 ;;; device-control.el --- Device control
 
-;; Copyright (C) 2014 2014 Free Software Foundation, Inc.
+;; Copyright (C) 2014-2018 Free Software Foundation, Inc.
 
 ;; Author: Jeremy Compostella <jeremy.compostella@gmail.com>
 ;;         Robert Jarzmik <robert.jarzmik@free.fr>
+;;         Sylvain Chouleur <sylvain.chouleur@gmail.com>
+
 ;; Keywords: comm, processes, devices
 ;; Package: device-control
 
