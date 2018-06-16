@@ -39,11 +39,20 @@
 (require 'tramp)
 (require 'notifications)
 
+(defgroup device-control nil
+  "Provide control of a locally or remotely connected device."
+  :group 'tools
+  :group 'processes)
+
 (defcustom dctrl-icon nil
   "Path to graphic file to be used as `device-control' module
 notification icon."
   :group 'device-control)
 
+(defcustom dctrl-time-format "[%Y/%m/%d %H:%M:%S]"
+  "Time format use to prefix events in the device control
+buffers."
+  :group 'device-control)
 
 (defconst dctrl-buf-fmt "*dctrl:%s-%s*"
   "Device Control buffer name format.  The first string is the
