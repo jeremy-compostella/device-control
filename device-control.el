@@ -77,7 +77,7 @@ connected indifferently.")
   "History of hostname.")
 
 ;; Backend interface
-;; To be implemented by each backend with dctrl-backend-register().
+;; To be implemented by each backend with `dctrl-register-backend'.
 (defstruct dctrl-backend
   name				; Unique name of a backend type
   (create 'ignore)		; Hook just before creating the control buffer
