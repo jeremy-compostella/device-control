@@ -419,8 +419,9 @@ functions should use this."
 	    (dctrl-include-backend-in-name (car cur))
 	    (dctrl-include-backend-in-name (cadr cur))))
 	(setq cur (cdr cur))))
-    (sort all (lambda (x y) (and (eq 'success (get-text-property 0 'face (car x)))
-				 (eq 'error (get-text-property 0 'face (car y))))))))
+    (cl-sort all (lambda (x y) (and (eq 'success (get-text-property 0 'face x))
+				    (eq 'error (get-text-property 0 'face y))))
+	     :key 'car)))
 
 (defun dctrl-process-sentinel (p e)
   (with-current-buffer (process-buffer p)
