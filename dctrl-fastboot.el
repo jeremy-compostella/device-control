@@ -1,4 +1,4 @@
-;;; device-control-fastboot.el --- Device control Fastboot backend
+;;; dctrl-fastboot.el --- Device control Fastboot backend
 
 ;; Copyright (C) 2014-2018 Free Software Foundation, Inc.
 
@@ -144,4 +144,4 @@
 		     :get-actions 'dctrl-fastboot-get-actions
 		     :guess-device-names 'dctrl-fastboot-guess-device-names))
 
-(provide 'device-control-fastboot)
+(provide 'dctrl-fastboot)

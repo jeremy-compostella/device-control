@@ -128,4 +128,4 @@
 		     :create 'dctrl-relay-init
 		     :get-actions 'dctrl-relay-get-actions))
 
-(provide 'device-control-relay)
+(provide 'dctrl-relay)

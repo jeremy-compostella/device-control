@@ -1,4 +1,4 @@
-;;; device-control-adb.el --- Device control ADB backend
+;;; dctrl-adb.el --- Device control ADB backend
 
 ;; Copyright (C) 2014-2018 Free Software Foundation, Inc.
 
@@ -24,7 +24,8 @@
 
 ;;; Commentary:
 
-;; This package is a `device-control' backend for Android ADB.
+;; This package is a `device-control' backend for Android Debug
+;; Bridge.
 
 (require 'device-control)
 
@@ -110,4 +111,4 @@
 		     :get-actions 'dctrl-adb-get-actions
 		     :guess-device-names 'dctrl-adb-guess-device-names))
 
-(provide 'device-control-adb)
+(provide 'dctrl-adb)

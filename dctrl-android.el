@@ -1,4 +1,4 @@
-;;; device-control.el --- Device control Android meta-backend
+;;; dctrl-android.el --- Device control Android meta-backend
 
 ;; Copyright (C) 2014-2018 Free Software Foundation, Inc.
 
@@ -27,12 +27,12 @@
 ;;; Commentary:
 
 ;; This package is a `device-control' meta-backend aggregating
-;; `device-control-adb' abd `device-control-fastboot' backends.
+;; `dctrl-adb' abd `dctrl-fastboot' backends.
 
 
 (require 'device-control)
-(require 'device-control-adb)
-(require 'device-control-fastboot)
+(require 'dctrl-adb)
+(require 'dctrl-fastboot)
 
 (defun dctrl-android-get-actions ()
   (dctrl-agregate-fun-list (dctrl-build-fun-list "dctrl-adb-action-")
@@ -58,4 +58,4 @@
 		     :get-actions 'dctrl-android-get-actions
 		     :guess-device-names 'dctrl-android-guess-device-names))
 
-(provide 'device-control-android)
+(provide 'dctrl-android)

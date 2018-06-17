@@ -1,4 +1,4 @@
-;;; device-control-flashrom.el --- Device control for the flashrom
+;;; dctrl-flashrom.el --- Device control for the flashrom
 ;;; utility
 
 ;; Copyright (C) 2014-2018 Free Software Foundation, Inc.
@@ -60,4 +60,4 @@
  (make-dctrl-backend :name "flashrom"
 		     :get-actions 'dctrl-flashrom-get-actions))
 
-(provide 'device-control-flashrom)
+(provide 'dctrl-flashrom)
