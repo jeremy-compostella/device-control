@@ -29,7 +29,6 @@
 ;; This package is a `device-control' meta-backend aggregating
 ;; `dctrl-adb' abd `dctrl-fastboot' backends.
 
-
 (require 'device-control)
 (require 'dctrl-adb)
 (require 'dctrl-fastboot)

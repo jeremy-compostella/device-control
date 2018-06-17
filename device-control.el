@@ -75,8 +75,8 @@ the state the action FIFO should be put to after the action.
   "The backend handling the controlled device.")
 (defvar-local dctrl-state 'stopped
   "The action FIFO state for the controlled device.
-Might be 'stopped, 'running or 'sleep.")
-(defvar-local dctrl-device-name nil
+Might be 'stopped', 'running' or 'sleep'.")
+(defvar-local dctrl-device nil
   "The device name provided at `device-control-start' time.")
 (defvar-local dctrl-automatic-mode nil
   "Don't use any specific device, use the one which is currently
@@ -86,13 +86,12 @@ connected indifferently.")
 
 (defvar device-control-action-history '()
   "History of actions.")
-(defvar dctrl-hostname-history '()
-  "History of hostname.")
+(defvar dctrl-host-history '()
+  "History of host.")
 
 ;; Backend interface
-;; To be implemented by each backend with `dctrl-register-backend'.
 (defstruct dctrl-backend
-  name				; Unique name of a backend type
+  name				; Unique name of the backend
   (create 'ignore)		; Hook just before creating the control buffer
   (start 'ignore)		; Hook just before starting a FIFO execution
   (pause 'ignore)		; Hook just before pausing a FIFO execution
@@ -101,7 +100,8 @@ connected indifferently.")
   (cancel 'ignore)		; Hook just before cancelling the current execution
   (kill 'ignore)		; Hook just before killing the current action
   (guess-device-names 'ignore)	; Backend might hint device names (completion)
-  get-actions)			; Provides backend available actions alist (NAME . fct_action)
+  get-actions)			; Provides backend available actions
+				; alist (NAME . fct_action)
 
 (defun dctrl-register-backend (backend)
   "Register a backend to the device control available backends.
