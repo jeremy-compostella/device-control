@@ -185,11 +185,10 @@ its functions available to device control."
 	((eq type 'clear)
 	 (setq dctrl-actions (copy-list dctrl-empty-fifo)))))
 
-(defmacro dctrl-buf-list (var-name var-value &optional bufs)
-  (declare (indent 1))
-  `(let ((my-bufs (or ,bufs (dctrl-buffers))))
-     (delete-if-not (curry 'eq ,var-value) my-bufs
-		    :key (curry 'buffer-local-value ,var-name))))
+(defun dctrl-buf-list (var-name var-value &optional bufs)
+  (let ((my-bufs (or bufs (dctrl-buffers))))
+    (delete-if-not (curry 'eq var-value) my-bufs
+		    :key (curry 'buffer-local-value var-name))))
 
 (defun dctrl-kill-current (&optional device-name)
   "Kill the current action."
