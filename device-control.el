@@ -52,9 +52,10 @@ notification icon."
 buffers."
   :group 'device-control)
 
-(defconst dctrl-buf-fmt "*dctrl:%s-%s*"
+(defcustom dctrl-buf-fmt "*dctrl:%s-%s*"
   "Device Control buffer name format.  The first string is the
-backend name and the second string is the device name.")
+backend name and the second string is the device name."
+  :group 'device-control)
 
 (defvar dctrl-backends '()
   "List of regitered backends through `dctrl-register-backend'.")
