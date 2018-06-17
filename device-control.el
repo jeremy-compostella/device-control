@@ -197,7 +197,7 @@ its functions available to device control."
   (when (get-buffer-process (current-buffer))
     (kill-process)))
 
-(defun dctrl-create-buffer (device-name backend-name hostname)
+(defun dctrl-create-buffer (device-name backend-name host)
   (let ((buf (get-buffer-create (format dctrl-buf-fmt backend-name device-name)))
 	(backend (dctrl-get-backend-by-name backend-name)))
     (with-current-buffer buf
@@ -205,14 +205,14 @@ its functions available to device control."
       (setq dctrl-state 'stopped
 	    dctrl-backend backend
 	    dctrl-actions (copy-list dctrl-empty-fifo))
-      (if (string= "localhost" hostname)
+      (if (string= "localhost" host)
 	  (setq default-directory "~")
-	(setq default-directory (format "/ssh:%s:" hostname)))
+	(setq default-directory (format "/ssh:%s:" host)))
       (if (string= device-name "automatic")
 	  (progn (setq dctrl-automatic-mode t)
-		 (setq dctrl-device-name (read-string "Give a name to your device: "))
-		 (rename-buffer (format dctrl-buf-fmt backend-name dctrl-device-name)))
-	  (setq dctrl-device-name device-name))
+		 (setq dctrl-device (read-string "Give a name to your device: "))
+		 (rename-buffer (format dctrl-buf-fmt backend-name dctrl-device)))
+	  (setq dctrl-device device-name))
       (funcall (dctrl-backend-create dctrl-backend)))
     buf))
 
@@ -224,11 +224,11 @@ its functions available to device control."
 (defun dctrl-get-buffer (device-name)
   (find device-name (dctrl-buffers)
 	:test 'string=
-	:key (curry 'buffer-local-value 'dctrl-device-name)))
+	:key (curry 'buffer-local-value 'dctrl-device)))
 
 (defun dctrl-get-list-devices (&optional state backend-name)
   (let ((state-bufs (if state (dctrl-buf-list 'dctrl-state state) (dctrl-buffers))))
-    (mapcar (curry 'buffer-local-value 'dctrl-device-name)
+    (mapcar (curry 'buffer-local-value 'dctrl-device)
 	    (if backend-name
 		(dctrl-buf-list 'dctrl-backend backend-name state-bufs)
 	      state-bufs))))
@@ -238,8 +238,8 @@ its functions available to device control."
 (defsubst dctrl-same-backend-same-host (buf1 buf2)
   (and (string= (dctrl-backend-name (buffer-local-value 'dctrl-backend buf1))
 		(dctrl-backend-name (buffer-local-value 'dctrl-backend buf2)))
-       (string= (dctrl-get-buffer-hostname (buffer-local-value 'default-directory buf1))
-		(dctrl-get-buffer-hostname (buffer-local-value 'default-directory buf2)))))
+       (string= (dctrl-get-buffer-host (buffer-local-value 'default-directory buf1))
+		(dctrl-get-buffer-host (buffer-local-value 'default-directory buf2)))))
 
 (defun dctrl-online-devices ()
   (let ((bufs (delete-duplicates (dctrl-buffers) :test 'dctrl-same-backend-same-host)))
@@ -266,10 +266,10 @@ its functions available to device control."
     (sort devices (lambda (x y) (> (dctrl-device-score x)
 				   (dctrl-device-score y))))))
 
-(defun dctrl-complete-device (&optional state backend-name)
+(defun dctrl-read-device (&optional state backend-name)
   (interactive)
   (let ((devices-list (dctrl-get-list-devices state backend-name)))
-    (cond ((eq major-mode 'device-control-mode) dctrl-device-name)
+    (cond ((eq major-mode 'device-control-mode) dctrl-device)
 	  ((= 0 (length devices-list)) (device-control-start))
 	  ((= 1 (length devices-list)) (car devices-list))
 	  ((ido-completing-read "Device: " (dctrl-smart-order devices-list))))))
@@ -283,44 +283,45 @@ its functions available to device control."
 		       info-host ":")))
 	"")))
 
-(defun dctrl-get-buffer-hostname (&optional dir)
+(defun dctrl-get-buffer-host (&optional dir)
   (let ((dir (or dir default-directory)))
     (or (and (tramp-tramp-file-p dir)
 	     (with-parsed-tramp-file-name dir info
 	       info-host))
 	"localhost")))
 
-;; Interactives
-(defun device-control-start (&optional hostname backend-name device-name)
-  "Create a device controller, requiring a backend type. The
-backend should have been registered with device-control-register-backend."
-  (interactive)
-  (let ((hostname (or hostname (read-string "Hostname: " (dctrl-get-buffer-hostname)
-					    'dctrl-hostname-history))))
-    (unless backend-name
-      (setq backend-name
-	    (ido-completing-read (format "Device control backend (on %s): " hostname)
-				 (mapcar 'dctrl-backend-name dctrl-backends))))
-    (unless device-name
-      (setq device-name
-	    (ido-completing-read (format "Device name (on %s): " hostname)
-				 (nconc '("automatic")
+(defun dctrl-read-backend (host)
+  (ido-completing-read (format "Device control backend (on %s): " host)
+		       (mapcar 'dctrl-backend-name dctrl-backends)))
+
+(defun dctrl-read-new-device (host backend)
+  (ido-completing-read (format "Device name (on %s): " host)
+		       (delq nil (nconc '("automatic")
 					(funcall (dctrl-backend-guess-device-names
-						  (dctrl-get-backend-by-name backend-name)))))))
-    (when device-name
-      (with-current-buffer (dctrl-create-buffer device-name backend-name hostname)
-	dctrl-device-name))))
+						  (dctrl-get-backend-by-name backend)))))))
+;; End user functions
+(defun device-control-start (&optional host backend device)
+  "Create a device controller.  A device controller is a buffer
+associated to a HOST, a BACKEND and a DEVICE."
+  (interactive)
+  (let* ((host (or host (read-string "Host: " (dctrl-get-buffer-host)
+				     'dctrl-host-history)))
+	 (backend (or backend (dctrl-read-backend host)))
+	 (device (or device (dctrl-read-new-device host backend))))
+    (when device
+      (with-current-buffer (dctrl-create-buffer device backend host)
+	dctrl-device))))
 
 (defun device-control (device-name)
   "Enqueue a new action in the actions fifo for a device.
-  Start the fifo execution if not running yet."
-  (interactive (list (dctrl-complete-device)))
+Start the FIFO execution if it is not started yet."
+  (interactive (list (dctrl-read-device)))
   (setq dctrl-last-used-device device-name)
   (with-current-buffer (dctrl-get-buffer device-name)
     (let* ((actions (funcall (dctrl-backend-get-actions dctrl-backend)))
 	   (action (ido-completing-read (format "Action (%s on %s): "
 						device-name
-						(dctrl-get-buffer-hostname))
+						(dctrl-get-buffer-host))
 					(mapcar 'car actions) nil t nil
 					'device-control-action-history)))
       (nconc dctrl-actions (funcall (assoc-default action actions)))
@@ -328,7 +329,7 @@ backend should have been registered with device-control-register-backend."
 
 (defun dctrl-cancel (device-name)
   "Cancel the current action and pause the fifo execution."
-  (interactive (list (dctrl-complete-device 'running)))
+  (interactive (list (dctrl-read-device 'running)))
   (with-current-buffer (dctrl-get-buffer device-name)
     (unless (eq dctrl-state 'running)
       (error "device-control: selected control buffer is not in running state."))
@@ -339,7 +340,7 @@ backend should have been registered with device-control-register-backend."
 
 (defun dctrl-cancel-and-clear (&optional device-name)
   "Cancel the current action and pause the fifo execution."
-  (interactive (list (dctrl-complete-device 'running)))
+  (interactive (list (dctrl-read-device 'running)))
   (with-current-buffer (dctrl-get-buffer device-name)
     (dctrl-kill-current)
     (dctrl-stop 'clear)
@@ -347,7 +348,7 @@ backend should have been registered with device-control-register-backend."
 
 (defun dctrl-pause (&optional device-name)
   "Let finish the current and pause the fifo execution."
-  (interactive (list (dctrl-complete-device 'running)))
+  (interactive (list (dctrl-read-device 'running)))
   (with-current-buffer (dctrl-get-buffer device-name)
     (unless (eq dctrl-state 'running)
       (error "device-control: selected control buffer is not in running state."))
@@ -357,7 +358,7 @@ backend should have been registered with device-control-register-backend."
 
 (defun dctrl-resume (&optional device-name)
   "Resume the fifo execution. See `dctrl-pause' and `dctrl-cancel'"
-  (interactive (list (dctrl-complete-device 'paused)))
+  (interactive (list (dctrl-read-device 'paused)))
   (with-current-buffer (dctrl-get-buffer device-name)
     (unless (eq dctrl-state 'paused)
       (error "device-control: selected control buffer is not in paused state."))
@@ -365,7 +366,7 @@ backend should have been registered with device-control-register-backend."
     (dctrl-start)))
 
 (defun dctrl-kill-device (device-name)
-  (interactive (list (dctrl-complete-device)))
+  (interactive (list (dctrl-read-device)))
   (kill-buffer (dctrl-get-buffer device-name)))
 
 ;; Mode
