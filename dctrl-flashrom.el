@@ -40,12 +40,9 @@
    (nconc (list flashrom-exec) (list "-p" "dediprog:voltage=1.8V" "-w") args)))
 
 (defun dctrl-flashrom-action-flash (&optional file)
-  (let ((file (read-file-name "Flash file: " nil nil t))
-	tramp-cmd ctrlhost-filename)
-    (multiple-value-setq (tramp-cmd ctrlhost-filename)
-      (dctrl-untramp-file file))
-    (append tramp-cmd
-	    (dctrl-flashrom-run (expand-file-name ctrlhost-filename)))))
+  (let ((file (read-file-name "Flash file: " nil nil t)))
+    (with-untramped-file file
+      (dctrl-flashrom-run file))))
 
 (defun dctrl-flashrom-device-present-p ()
   (delq nil (mapcar (lambda (line)
