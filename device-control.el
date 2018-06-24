@@ -504,8 +504,9 @@ In all cases, returns a list of :
 		      dst-filename)
 	    final-filename dst-filename)))
     (if xfer
-	(list (apply xfer (list cmd)) final-filename)
-      (list nil final-filename))))
+	(list (apply xfer (list cmd))
+	      (expand-file-name final-filename))
+      (list nil (expand-file-name final-filename)))))
 
 (defsubst curry (function &rest arguments)
   (lexical-let ((function function)
