@@ -43,7 +43,7 @@
 				     ("system"		.	"system.img")
 				     ("vendor"		.	"vendor.img")
 				     ("odm"		.	"odm.img")
-				     ("vbmeta"		.	"vbmeta.img"
+				     ("vbmeta"		.	"vbmeta.img")
 				     ("zimage"		.	"kernel")
 				     ("kernel"		.	"kernel")
 				     ("ramdisk"		.	"ramdisk.img")))
