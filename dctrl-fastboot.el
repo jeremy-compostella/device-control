@@ -88,8 +88,6 @@
   (let ((action (or action (ido-completing-read "Action: " dctrl-fsb-oem-actions-list nil t))))
     (dctrl-fsb-run "oem" action)))
 
-(defvar dctrl-fsb-flashing-actions-list )
-
 (defun dctrl-fsb-action-flashing (&optional action)
   (dctrl-fsb-run "flashing" (ido-completing-read "Action: " '("lock" "unlock"))))
 
