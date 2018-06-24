@@ -70,35 +70,35 @@
   (or target
       (ido-completing-read "Target: " (mapcar 'car dctrl-fsb-targets))))
 
-(defun dctrl-fastboot-action-flash (&optional target file)
+(defun dctrl-fsb-action-flash (&optional target file)
   (let* ((target (dctrl-fsb-read-target target))
 	 (file (dctrl-fsb-read-file "Target" file (dctrl-fsb-default target))))
     (with-untramped-file file
       (dctrl-fsb-run "flash" target file))))
 
-(defun dctrl-fastboot-action-erase (&optional partition)
+(defun dctrl-fsb-action-erase (&optional partition)
   (dctrl-fsb-run "erase" (dctrl-fsb-read-target partition)))
 
-(defun dctrl-fastboot-action-format (&optional partition)
+(defun dctrl-fsb-action-format (&optional partition)
   (dctrl-fsb-run "format" (dctrl-fsb-read-target partition)))
 
-(defvar dctrl-fastboot-oem-actions-list '("lock" "unlock" "verified"))
+(defvar dctrl-fsb-oem-actions-list '("lock" "unlock" "verified"))
 
-(defun dctrl-fastboot-action-oem (&optional action)
-  (let ((action (or action (ido-completing-read "Action: " dctrl-fastboot-oem-actions-list nil t))))
+(defun dctrl-fsb-action-oem (&optional action)
+  (let ((action (or action (ido-completing-read "Action: " dctrl-fsb-oem-actions-list nil t))))
     (dctrl-fsb-run "oem" action)))
 
-(defvar dctrl-fastboot-flashing-actions-list )
+(defvar dctrl-fsb-flashing-actions-list )
 
-(defun dctrl-fastboot-action-flashing (&optional action)
+(defun dctrl-fsb-action-flashing (&optional action)
   (dctrl-fsb-run "flashing" (ido-completing-read "Action: " '("lock" "unlock"))))
 
-(defun dctrl-fastboot-action-boot (&optional file)
+(defun dctrl-fsb-action-boot (&optional file)
   (let ((file (dctrl-fsb-read-file "Boot" file "boot.img")))
     (with-untramped-file file
       (dctrl-fsb-run "boot" file))))
 
-(defun dctrl-fastboot-action-flash-raw (&optional kernel ramdisk)
+(defun dctrl-fsb-action-flash-raw (&optional kernel ramdisk)
   (let ((kernel (dctrl-fsb-read-file "Kernel" kernel
 				     (dctrl-fsb-default "kernel")))
 	(ramdisk (dctrl-fsb-read-file "Ramdisk" ramdisk
@@ -107,28 +107,28 @@
       (with-untramped-file ramdisk
 	(dctrl-fsb-run "flash:raw" kernel ramdisk)))))
 
-(defun dctrl-fastboot-action-continue ()
+(defun dctrl-fsb-action-continue ()
   (dctrl-fsb-run "continue"))
 
-(defun dctrl-fastboot-action-reboot ()
+(defun dctrl-fsb-action-reboot ()
   (dctrl-fsb-run "reboot"))
 
-(defun dctrl-fastboot-action-reboot-bootloader ()
+(defun dctrl-fsb-action-reboot-bootloader ()
   (dctrl-fsb-run "reboot-bootloader"))
 
-(defun dctrl-fastboot-connected-p ()
-  (let ((devices (dctrl-fastboot-guess-device-names)))
+(defun dctrl-fsb-connected-p ()
+  (let ((devices (dctrl-fsb-guess-device-names)))
     (if dctrl-automatic-mode
 	devices
       (find dctrl-device-name devices :test 'string=))))
 
-(defun dctrl-fastboot-get-actions ()
-  (dctrl-build-fun-list "dctrl-fastboot-action-"
-			(if (dctrl-fastboot-connected-p) 'success 'error)))
+(defun dctrl-fsb-get-actions ()
+  (dctrl-build-fun-list "dctrl-fsb-action-"
+			(if (dctrl-fsb-connected-p) 'success 'error)))
 
 (defconst fastboot-dev-line "^\\\([[:alnum:]]+\\\)[[:space:]]+fastboot$")
 
-(defun dctrl-fastboot-guess-device-names ()
+(defun dctrl-fsb-guess-device-names ()
   (mapcar (lambda (line)
 	    (when (numberp (string-match fastboot-dev-line line))
 	      (match-string 1 line)))
@@ -137,7 +137,7 @@
 
 (dctrl-register-backend
  (make-dctrl-backend :name "fastboot"
-		     :get-actions 'dctrl-fastboot-get-actions
-		     :guess-device-names 'dctrl-fastboot-guess-device-names))
+		     :get-actions 'dctrl-fsb-get-actions
+		     :guess-device-names 'dctrl-fsb-guess-device-names))
 
 (provide 'dctrl-fastboot)

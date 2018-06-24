@@ -35,16 +35,16 @@
 
 (defun dctrl-android-get-actions ()
   (dctrl-agregate-fun-list (dctrl-build-fun-list "dctrl-adb-action-")
-			   (dctrl-build-fun-list "dctrl-fastboot-action-")))
+			   (dctrl-build-fun-list "dctrl-fsb-action-")))
 
 (defun dctrl-android-guess-device-names ()
   (nconc (dctrl-adb-guess-device-names)
-	 (dctrl-fastboot-guess-device-names)))
+	 (dctrl-fsb-guess-device-names)))
 
 (defun dctrl-android-show-online-devices ()
   (interactive)
   (let ((adb-devices (dctrl-adb-guess-device-names))
-	(fastboot-devices (dctrl-fastboot-guess-device-names)))
+	(fastboot-devices (dctrl-fsb-guess-device-names)))
     (if (or adb-devices fastboot-devices)
 	(message (mapconcat 'identity
 			    (append (mapcar (curry 'concat "adb:") adb-devices)
