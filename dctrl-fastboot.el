@@ -34,9 +34,9 @@
 
 (defun dctrl-fsb-run (&rest args)
   (dctrl-run-process
-   (nconc (list fastboot-exec) (if dctrl-automatic-mode
-				   '()
-				 (list "-p" dctrl-device-name))
+   (nconc (list fastboot-program) (if dctrl-automatic-mode
+				      '()
+				    (list "-p" dctrl-device-name))
 	  args)))
 
 (defcustom dctrl-fsb-targets
@@ -132,7 +132,7 @@
 	    (when (numberp (string-match fastboot-dev-line line))
 	      (match-string 1 line)))
 	  (split-string (shell-command-to-string
-			 (concat fastboot-exec " devices")) "\n" t)))
+			 (concat fastboot-program " devices")) "\n" t)))
 
 (dctrl-register-backend
  (make-dctrl-backend :name "fastboot"
