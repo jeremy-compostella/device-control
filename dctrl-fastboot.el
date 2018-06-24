@@ -99,7 +99,8 @@
       (dctrl-fsb-run "boot" file))))
 
 (defun dctrl-fastboot-action-flash-raw (&optional kernel ramdisk)
-  (let ((kernel (dctrl-fsb-read-file "Kernel" kernel))
+  (let ((kernel (dctrl-fsb-read-file "Kernel" kernel
+				     (dctrl-fsb-default "kernel")))
 	(ramdisk (dctrl-fsb-read-file "Ramdisk" ramdisk
 				      (dctrl-fsb-default "ramdisk"))))
     (with-untramped-file kernel
