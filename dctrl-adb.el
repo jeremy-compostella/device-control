@@ -62,11 +62,9 @@
 (defun dctrl-adb-action-push-file (&optional filename dst-filename)
   (let* ((ido-file-history 'adb-push-file-history)
 	 (src (expand-file-name (or filename (ido-read-file-name "Source: " ))))
-	 (dst (or dst-filename (read-string "Target: " nil)))
-	 tramp-cmd ctrlhost-filename)
-    (multiple-value-setq (tramp-cmd ctrlhost-filename)
-      (dctrl-untramp-file src))
-    (append tramp-cmd (dctrl-adb-run "push" ctrlhost-filename dst))))
+	 (dst (or dst-filename (read-string "Target: " nil))))
+    (with-untramped-file src
+      (dctrl-adb-run "push" src dst))))
 
 (defun dctrl-adb-aosp-out-dir ()
   (when (and aosp-path aosp-board-name)
@@ -77,15 +75,13 @@
 	tramp-cmd ctrlhost-filename)
     (unless (and file (file-exists-p file))
       (setq file (ido-read-file-name "File to flash: " (dctrl-adb-aosp-out-dir))))
-    (multiple-value-setq (tramp-cmd ctrlhost-filename)
-      (dctrl-untramp-file file))
-    (append tramp-cmd
-	    (dctrl-adb-run "root")
-	    (dctrl-action-wait 2)
-	    (dctrl-adb-run "push" (expand-file-name ctrlhost-filename) "/data/local/tmp/update.zip")
-	    (dctrl-adb-run "shell" "mkdir" "-p" "/cache/recovery")
-	    (dctrl-adb-run "shell" "echo '--update_package=/data/local/tmp/update.zip' > /cache/recovery/command")
-	    (dctrl-adb-run "shell" "start" "pre-recovery"))))
+    (with-untramped-file file
+      (append (dctrl-adb-run "root")
+	      (dctrl-action-wait 2)
+	      (dctrl-adb-run "push" file "/data/local/tmp/update.zip")
+	      (dctrl-adb-run "shell" "mkdir" "-p" "/cache/recovery")
+	      (dctrl-adb-run "shell" "echo '--update_package=/data/local/tmp/update.zip' > /cache/recovery/command")
+	      (dctrl-adb-run "shell" "start" "pre-recovery")))))
 
 (defun dctrl-adb-connected-p ()
   (let ((devices (dctrl-adb-guess-device-names)))
