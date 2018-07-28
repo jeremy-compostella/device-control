@@ -1,0 +1,4 @@
+*device-control* is a [[https://www.gnu.org/software/emacs/][GNU/Emacs]] module which provides control of a
+device such as an Android device, would it be locally connected or
+remotely connected through tramp.  The "control" relies on a backend,
+which provides commands available on the device.
