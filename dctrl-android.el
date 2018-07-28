@@ -41,17 +41,6 @@
   (nconc (dctrl-adb-guess-device-names)
 	 (dctrl-fsb-guess-device-names)))
 
-(defun dctrl-android-show-online-devices ()
-  (interactive)
-  (let ((adb-devices (dctrl-adb-guess-device-names))
-	(fastboot-devices (dctrl-fsb-guess-device-names)))
-    (if (or adb-devices fastboot-devices)
-	(message (mapconcat 'identity
-			    (append (mapcar (curry 'concat "adb:") adb-devices)
-				    (mapcar (curry 'concat "fastboot:") fastboot-devices))
-			    ", "))
-      (message "No device available"))))
-
 (dctrl-register-backend
  (make-dctrl-backend :name "android"
 		     :get-actions 'dctrl-android-get-actions
