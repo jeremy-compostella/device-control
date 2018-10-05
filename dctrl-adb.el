@@ -71,8 +71,7 @@
     (concat aosp-path "/out/target/product/" aosp-board-name "/")))
 
 (defun dctrl-adb-action-ota (&optional file)
-  (let ((file file)
-	tramp-cmd ctrlhost-filename)
+  (let ((file file))
     (unless (and file (file-exists-p file))
       (setq file (ido-read-file-name "File to flash: " (dctrl-adb-aosp-out-dir))))
     (with-untramped-file file
