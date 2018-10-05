@@ -60,7 +60,8 @@
 (defun dctrl-fsb-read-file (label &optional file default-filename)
   (if (and file (file-exists-p file))
       file
-    (let ((dir (when (and aosp-path aosp-board-name)
+    (let ((dir (when (and (boundp 'aosp-path) aosp-path
+			  (boundp 'aosp-board-name) aosp-board-name)
 		 (concat aosp-path "/out/target/product/"
 			 aosp-board-name "/"))))
       (ido-read-file-name (format "%s file: " label)

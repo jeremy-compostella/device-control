@@ -70,7 +70,8 @@
       (dctrl-adb-run "push" src dst))))
 
 (defun dctrl-adb-aosp-out-dir ()
-  (when (and aosp-path aosp-board-name)
+  (when (and (boundp 'aosp-path) aosp-path
+	     (boundp 'aosp-board-name) aosp-board-name)
     (concat aosp-path "/out/target/product/" aosp-board-name "/")))
 
 (defun dctrl-adb-action-ota (&optional file)
