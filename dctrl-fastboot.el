@@ -106,6 +106,11 @@
       (with-untramped-file ramdisk
 	(dctrl-fsb-run "flash:raw" kernel ramdisk)))))
 
+(defun dctrl-fsb-action-update (&optional zipfile)
+  (let ((zipfile (dctrl-fsb-read-file "Zipfile" zipfile "img.zip")))
+    (with-untramped-file zipfile
+      (dctrl-fsb-run "update" zipfile))))
+
 (defun dctrl-fsb-action-continue ()
   (dctrl-fsb-run "continue"))
 
