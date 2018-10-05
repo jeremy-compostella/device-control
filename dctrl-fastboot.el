@@ -32,6 +32,9 @@
   "The default fastboot program."
   :group 'device-control)
 
+(defvar aosp-path nil)
+(defvar aosp-board-name nil)
+
 (defun dctrl-fsb-run (&rest args)
   (dctrl-run-process
    (nconc (list fastboot-program) (if dctrl-automatic-mode

@@ -33,6 +33,9 @@
 
 (defvar adb-push-file-history '())
 
+(defvar aosp-path nil)
+(defvar aosp-board-name nil)
+
 (defun dctrl-adb-run (&rest args)
   (dctrl-run-process
    (nconc (list adb-exec) (if dctrl-automatic-mode
