@@ -49,6 +49,9 @@
 (defun dctrl-adb-action-remount ()
   (dctrl-adb-run "remount"))
 
+(defun dctrl-adb-action-disable-verity ()
+  (dctrl-adb-run "disable-verity"))
+
 (defvar dctrl-adb-reboot-target '("" "bootloader" "recovery"))
 
 (defun dctrl-adb-action-reboot (&optional target)
