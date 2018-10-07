@@ -86,6 +86,17 @@
 	      (dctrl-adb-run "shell" "echo '--update_package=/data/local/tmp/update.zip' > /cache/recovery/command")
 	      (dctrl-adb-run "shell" "start" "pre-recovery")))))
 
+(defun dctrl-adb-action-sideload (&optional file)
+  (let ((file file))
+    (unless (and file (file-exists-p file))
+      (setq file (ido-read-file-name "File to flash: " (dctrl-adb-aosp-out-dir))))
+    (with-untramped-file file
+      (append (dctrl-adb-run "root")
+              (dctrl-action-wait 2)
+              (dctrl-adb-run "reboot" "sideload-auto-reboot")
+              (dctrl-adb-run "wait-for-sideload")
+              (dctrl-adb-run "sideload" file)))))
+
 (defun dctrl-adb-connected-p ()
   (let ((devices (dctrl-adb-guess-device-names)))
     (if dctrl-automatic-mode
