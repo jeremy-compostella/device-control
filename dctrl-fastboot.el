@@ -115,6 +115,9 @@
 (defun dctrl-fsb-action-reboot-bootloader ()
   (dctrl-fsb-run "reboot-bootloader"))
 
+(defun dctrl-fsb-action-wipe ()
+  (dctrl-fsb-run "-w"))
+
 (defun dctrl-fsb-connected-p ()
   (let ((devices (dctrl-fsb-guess-device-names)))
     (if dctrl-automatic-mode
