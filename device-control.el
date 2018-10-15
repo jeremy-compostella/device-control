@@ -139,13 +139,14 @@ its functions available to device control."
 (defun dctrl-headline-msg (msg)
   (when dctrl-prev-notif-id
     (notifications-close-notification dctrl-prev-notif-id))
-  (setq dctrl-prev-notif-id
-	(apply 'notifications-notify
-	       :app-name "DeviceControl"
-	       :title "Device control"
-	       :body msg
-	       (when dctrl-icon
-		 (list :app-icon dctrl-icon))))
+  (when (and (featurep 'dbusbind) (notifications-get-server-information))
+    (setq dctrl-prev-notif-id
+          (apply 'notifications-notify
+                 :app-name "DeviceControl"
+                 :title "Device control"
+                 :body msg
+                 (when dctrl-icon
+               (list :app-icon dctrl-icon)))))
   (dctrl-msg msg 'success))
 
 (defun dctrl-error (msg)
